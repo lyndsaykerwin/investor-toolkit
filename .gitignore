@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Editing artifacts
+*.bak
+*.bak.*
+
+# Excel lock files (~$ prefix when a file is open)
+~$*.xlsx
+~$*.xls
+
+# Your working sourcing output — these hold real company data, never publish them
+/themes/
+/outreach/tracker.jsonl
+/outreach/
+
+# Per-user agent state if someone clones into a skills folder
+.claude/
+
+# Per-user agent / MCP harness config — not part of the skill, keep it private
+.mcp.json
+
+# Local authoring guide — not part of the shipped skills
+AGENTS.md
+CLAUDE.md

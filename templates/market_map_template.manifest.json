@@ -1,0 +1,153 @@
+{
+  "manifest_version": "3.0",
+  "describes": "templates/Market_Map_Template.xlsx",
+  "template_sha256": "911febfd29b8c7caa7d1d5d00c3a88f36f3c5f6867ee14a20bfd1a487f7402c4",
+  "generated_by": "skills/render-market-map/scripts/render_market_map.py --make-template",
+  "do_not_edit": "Auto-derived from the renderer (the source of truth). Regenerate with --make-template after any layout change; never hand-edit.",
+  "sheet": "Theme Name",
+  "purpose": "Structural snapshot of the canonical empty template, so an agent can know its layout without opening the .xlsx live.",
+  "fingerprint_use": "If template_sha256 doesn't match the file, the template changed \u2014 regenerate this manifest.",
+  "layout_conventions": [
+    "No Theme Overview block: the theme narrative lives in the Market Brief and the JSONL _theme_meta record; the xlsx is the company landscape only.",
+    "Title rows (B2/B3) never wrap. Body-text columns wrap and each data row auto-sizes to its tallest cell.",
+    "Confirmed $0 funding renders as 'Bootstrapped'; band-only headcount shows the band via headcount_display."
+  ],
+  "global_style": {
+    "font_name": "Calibri",
+    "note": "Value cells use blue font FF0000FF; data cells carry borders on all four sides."
+  },
+  "column_widths": {
+    "A": 3.0,
+    "B": 24.0,
+    "C": 22.0,
+    "D": 11.0,
+    "E": 14.0,
+    "F": 14.0,
+    "G": 13.0,
+    "H": 38.0,
+    "I": 50.0,
+    "J": 20.0,
+    "K": 3.0
+  },
+  "header_block": {
+    "B2": {
+      "value": "INVESTMENT THEME MARKET MAP",
+      "font": "Calibri 20 bold",
+      "font_color": "FF0E2841",
+      "align": "left",
+      "wrap": false
+    },
+    "B3": {
+      "value": "[Theme Name]",
+      "font": "Calibri 12 italic",
+      "font_color": "FF595959",
+      "align": "left",
+      "wrap": false
+    },
+    "J2": {
+      "value": "Prepared by: [Firm Name]",
+      "font": "Calibri 9",
+      "font_color": "FF595959",
+      "align": "right",
+      "wrap": false
+    },
+    "J3": {
+      "value": "Date: [MM/DD/YYYY]",
+      "font": "Calibri 9",
+      "font_color": "FF595959",
+      "align": "right",
+      "wrap": false
+    }
+  },
+  "sections": [
+    {
+      "name": "FIRM FIT PROSPECTS",
+      "header_cell": "B5",
+      "subtitle": "Targets aligned to firm thesis",
+      "column_header_row": 6,
+      "columns": {
+        "B": "Company",
+        "C": "HQ Location",
+        "D": "Year Founded",
+        "E": "Headcount",
+        "F": "Total Funding",
+        "G": "ARR $M (if known)",
+        "H": "Product / Positioning",
+        "I": "Fit Rationale",
+        "J": "Outreach Status"
+      },
+      "column_alignment": {
+        "B": "left",
+        "C": "left",
+        "D": "center",
+        "E": "center",
+        "F": "center",
+        "G": "right",
+        "H": "left",
+        "I": "left",
+        "J": "left"
+      }
+    },
+    {
+      "name": "MARKET LEADERS",
+      "header_cell": "B8",
+      "subtitle": "Category-defining incumbents",
+      "column_header_row": 9,
+      "columns": {
+        "B": "Company",
+        "C": "HQ Location",
+        "D": "Year Founded",
+        "E": "Ticker",
+        "F": "Status",
+        "G": "Mkt Cap / Val.",
+        "H": "Product / Positioning",
+        "I": "Strategic Relevance"
+      },
+      "column_alignment": {
+        "B": "left",
+        "C": "left",
+        "D": "center",
+        "E": "center",
+        "F": "center",
+        "G": "right",
+        "H": "left",
+        "I": "left"
+      }
+    },
+    {
+      "name": "FUNDED COMPANIES",
+      "header_cell": "B11",
+      "subtitle": "Venture-backed scale-ups",
+      "column_header_row": 12,
+      "columns": {
+        "B": "Company",
+        "C": "HQ Location",
+        "D": "Year Founded",
+        "E": "Last Round",
+        "F": "Total Raised",
+        "G": "Lead Investors",
+        "H": "Product / Positioning",
+        "I": "Observations"
+      },
+      "column_alignment": {
+        "B": "left",
+        "C": "left",
+        "D": "center",
+        "E": "center",
+        "F": "right",
+        "G": "left",
+        "H": "left",
+        "I": "left"
+      }
+    }
+  ],
+  "footer": {
+    "B14": {
+      "value": "Sources: company websites, analyst reports, and the cited links in the landscape JSONL.",
+      "font": "Calibri 8 italic",
+      "font_color": "FF808080",
+      "align": "left",
+      "wrap": true
+    }
+  }
+}

@@ -16,7 +16,7 @@ or bracketed placeholders are still present).
 
 ## The intake
 
-Ask these in order. For every pick-list the user may **choose more than one**, and each offers
+You must ask these specific questions that drive screening & company enrichment workflows later. Do not deviate from the list or add things like "revenue band" as company criteria. For every pick-list the user may **choose more than one**, and each offers
 **"doesn't matter"** as a valid answer — record that literally as `Any` so downstream skills never
 invent a filter the user didn't set.
 
@@ -26,17 +26,15 @@ invent a filter the user didn't set.
    - **Strategic acquirer** — you already own operating companies and want targets that fit
      alongside them.
 
-   Then one quick follow-up based on their pick:
+   Then one quick follow-up if they choose strategic:
    - Chose **strategic acquirer** → *"Which companies or platforms you already own should a target
      complement?"* Capture the names — for a strategic buyer, "fit" means *complementary to those*,
      not just in-category.
-   - Chose **financial investor** → optionally *"growth, PE, or venture?"* — record it if they say;
-     it's context, not a filter.
 
 2. **Target company size** — by employee headcount; pick all bands that fit, or "doesn't matter":
    `1–10` · `11–50` · `51–200` · `201–500` · `500+`
 
-3. **Maximum prior funding raised** — *"surface companies that have raised less than…"*; pick all
+3. **Maximum prior funding raised** — *"surface companies that have raised equivalent or less than…"*; pick all
    that apply, or "doesn't matter":
    `Bootstrapped (no outside capital)` · `under $1M` · `under $5M` · `under $10M` · `under $25M` ·
    `under $50M` · `over $50M is fine`

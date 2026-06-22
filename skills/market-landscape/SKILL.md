@@ -11,6 +11,8 @@ Broaden a theme's landscape with more companies in the same space. Take the **se
 
 **Run this as a subagent-driven workflow:** subagents do the fanout, the core session QCs every result, and no company enters the landscape until it's verified as still operating under that name and still in the category — catching pivots, renames, acquisitions, and recent funding rounds before they land.
 
+**Fit lens — read the investor type in `shared/Firm_Profile.md` first.** For a **strategic acquirer**, weight candidates by how well they complement the portfolio/platforms named in that file (synergy), and flag the strongest complements in the `discovered_via` note — category match alone isn't the point. For a **financial buyer** (growth/PE/venture), weight standalone attractiveness against the thesis.
+
 ## The four techniques
 
 Run as many as the ~5 WebSearch/WebFetch budget allows, against each seed and the thesis lens:

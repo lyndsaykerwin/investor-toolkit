@@ -10,15 +10,17 @@ Last updated: [DATE]
 
 ## Section 1 — Hard filters (a candidate must pass ALL of these)
 
-Run as a checklist. Any "no" means the company is out.
+Run as a checklist. Any "no" means the company is out. A row set to **`Any`** is not a screen —
+every candidate passes it (use `Any` when the user answered "doesn't matter").
 
 - [ ] **Business type** — [e.g. proprietary software/data product, not consulting or managed services]
-- [ ] **Headcount** — [e.g. ≤200 employees (FTE)]
-- [ ] **Funding** — [e.g. under $20M total raised. Confirm with an authoritative single-record lookup
-      (any connected firmographic provider, or time-aware web search), never a bulk/cached one — see
-      Rule 5 in `research_rules.md`]
+- [ ] **Headcount** — [employee band(s) from setup, e.g. `11–200` FTE; or `Any`]
+- [ ] **Funding ceiling** — [companies that have raised **less than** the setup ceiling, e.g. under
+      $10M total raised; or `Any`. Confirm with an authoritative single-record lookup (any connected
+      firmographic provider, or time-aware web search), never a bulk/cached one — see Rule 5 in
+      `research_rules.md`]
 - [ ] **Independence** — [e.g. independent — not a subsidiary, not already acquired]
-- [ ] **Company age** — [e.g. founded 2023 or earlier — or leave open if you don't screen on age]
+- [ ] **Company age** — [e.g. founded 2023 or earlier — or `Any` if you don't screen on age]
 - [ ] **Category fit** — Operates in one of your Active themes (see `Investment_Themes.md`).
 
 ## Section 2 — Feature flags (scored signals, not gating)

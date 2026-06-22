@@ -7,7 +7,7 @@ Tools for investors: market mapping, target identification, building retention a
 Paste this to your agent:
 
 ```
-Clone github.com/lyndsaykerwin/investor_toolkit, copy skills/* into ~/.claude/skills/, and keep shared/ and templates/ alongside my working files.
+Fork & clone github.com/lyndsaykerwin/investor_toolkit (e.g. gh repo fork --clone), then install skills/ where my agent loads skills (Claude Code: ~/.claude/skills/), keeping shared/ and templates/ alongside.
 ```
 
 ## The Sourcing Workflow

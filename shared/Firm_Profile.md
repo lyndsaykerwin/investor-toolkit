@@ -9,7 +9,7 @@ Last updated: [DATE]
 
 ## Investor type
 
-[One or more of: **Growth equity** · **Private equity (control/buyout)** · **Venture** ·
+[Either: Financial buyer (**Growth equity**, **Private equity (control/buyout)**, **Venture**) or
 **Strategic acquirer**. A strategic acquirer already owns operating companies and weighs targets on
 synergy with them; the others are financial buyers who weigh standalone attractiveness.]
 
@@ -35,6 +35,8 @@ operate it. What does a great target look like in one breath?]
 
 - **Company size we target:** [employee headcount band(s) — e.g. `11–50` and `51–200`, or `Any` if
   size doesn't matter]
+- **Funding history of the target:** [amount of prior funding before now — e.g. must be bootstrapped, up to $10M, up to $20M, up to $50M or `Any` if
+  this doesn't matter]
 - **Who the target companies sell to:** [the end customer / buyer persona]
 - **Industries / verticals in scope:** [the categories you hunt in, or "not vertical-restricted"]
 - **Platforms / ecosystems we care about:** [any platforms whose ecosystem matters to your thesis —
@@ -52,5 +54,5 @@ operate it. What does a great target look like in one breath?]
 
 ## Other criteria
 
-[Anything else the user flagged as mattering to the investment decision — free text from the setup
+[Anything else the user flagged as mattering to the investment decision e.g. end user types, geography, investors they do or don't like to follow — free text from the setup
 catch-all question, or "N/A".]

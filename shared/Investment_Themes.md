@@ -31,5 +31,5 @@ Themes you've looked at and decided NOT to source.
 
 ---
 
-*To change these themes, edit this file directly, or re-run `sourcing-setup` to capture them from a
-short prompt.*
+*These themes get set as you deep-dive categories with `theme-first-pass`. You can also edit this
+file directly anytime.*

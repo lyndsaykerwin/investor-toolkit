@@ -4,10 +4,12 @@ Tools for investors: market mapping, target identification, building retention a
 
 ## Install
 
-Paste this to your agent:
+**Claude Cowork:** Customize → Personal plugins **+** → Create plugin → Add marketplace → paste `https://github.com/lyndsaykerwin/investor-toolkit` → Sync, then install the **investor-toolkit** plugin.
+
+**Claude Code** — paste this to your agent:
 
 ```
-Fork & clone github.com/lyndsaykerwin/investor_toolkit (e.g. gh repo fork --clone), then install skills/ where my agent loads skills (Claude Code: ~/.claude/skills/), keeping shared/ and templates/ alongside.
+Fork & clone github.com/lyndsaykerwin/investor-toolkit (e.g. gh repo fork --clone), then install skills/ where my agent loads skills (Claude Code: ~/.claude/skills/), keeping shared/ and templates/ alongside.
 ```
 
 ## The Sourcing Workflow

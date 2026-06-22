@@ -25,13 +25,13 @@ as an **Excel file or a CSV**, holding either MRR (monthly recurring revenue —
 **As an agent skill** — clone it into your agent's skills folder so the agent can discover it. For example:
 
 ```
-git clone https://github.com/YOUR-GITHUB-USERNAME/retention-analysis.git <your-agent-skills-folder>/retention-analysis
+git clone https://github.com/lyndsaykerwin/retention-analysis.git <your-agent-skills-folder>/retention-analysis
 ```
 
 **As a standalone Python tool** — clone anywhere and run the scripts directly:
 
 ```
-git clone https://github.com/YOUR-GITHUB-USERNAME/retention-analysis.git
+git clone https://github.com/lyndsaykerwin/retention-analysis.git
 cd retention-analysis
 ```
 
@@ -70,12 +70,14 @@ The agent triggers the skill, runs the survey step, asks you one upfront questio
 ## What's in the repo
 
 ```
-SKILL.md                              # the spec the agent follows
+SKILL.md                              # the spec the agent follows (decisions + workflow)
+reference/
+  formulas-and-layout.md              # exact formulas/layout/formatting (only for hand-building)
 scripts/
-  survey.py                           # phase 1: inspect the workbook, hypothesize structure
-  compute.py                          # phase 2: compute metrics from long-format CSV
-                                      #          (one row per customer-month, the tidy shape)
-  deliver.py                          # phase 3: write the Excel deliverable
+  survey.py                           # inspect the workbook, hypothesize its structure
+  compute.py                          # OPTIONAL independent cross-check of the metrics
+                                      #          (the deliverable does NOT depend on it)
+  deliver.py                          # write the Excel deliverable (builds from the CSV)
   fixtures/
     sample_retention_data.xlsx        # synthetic test data
     EXPECTED_VALUES.md                # hand-computed values the self-tests check against
@@ -89,4 +91,4 @@ README.md
 
 Retention metrics follow the SaaS Metrics Standards Board definitions for Gross retention (revenue kept, capped at 100%), Net retention (revenue kept plus expansion from existing customers, can exceed 100%), and Logo retention (count of customers kept, regardless of dollars). LTM retention uses the direct-cohort point-in-time method — take the set of customers active 12 months ago, sum their revenue today, divide by their revenue then.
 
-Full methodology, formula patterns, edge-case handling, and visual conventions are in `SKILL.md`.
+Full methodology and edge-case handling are in `SKILL.md`; exact formula patterns and visual conventions are in `reference/formulas-and-layout.md`.

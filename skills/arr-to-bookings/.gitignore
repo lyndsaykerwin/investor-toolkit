@@ -1,0 +1,5 @@
+**/_recalc/
+**/_out/
+a2b_recalc_*/
+*.DS_Store
+~$*.xlsx

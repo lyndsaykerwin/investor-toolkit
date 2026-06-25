@@ -3,12 +3,12 @@
   "owner": {
     "name": "Lyndsay Kerwin"
   },
-  "description": "Investor sourcing & analytics skills: market mapping, target identification, retention analytics, and finance-grade file formatting.",
+  "description": "Investor sourcing & analytics skills: market mapping, target identification, retention & bookings analytics, and finance-grade file formatting.",
   "plugins": [
     {
       "name": "investor-toolkit",
       "source": "./",
-      "description": "Investment/acquisition sourcing skills — idea to finished market map (brief + banker-grade Excel), plus retention analytics and Excel formatting. Firm-agnostic; configured to your thesis on first run."
+      "description": "Investment/acquisition sourcing skills — idea to finished market map (brief + banker-grade Excel), plus retention & bookings analytics and Excel formatting. Firm-agnostic; configured to your thesis on first run."
     }
   ]
 }

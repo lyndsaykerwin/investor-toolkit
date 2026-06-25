@@ -43,6 +43,7 @@ The agent checks for relevant skills before any task.
 **Analytics**
 
 - **retention-analysis** — Gross/Net/Logo retention + ARR corkscrew from customer-level revenue
+- **arr-to-bookings** — Quarterly new-logo vs. upsell ACV bookings from customer-level MRR/ARR (estimate; not for usage-based models)
 
 ## Principles
 

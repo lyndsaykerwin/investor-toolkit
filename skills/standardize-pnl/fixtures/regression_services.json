@@ -1,0 +1,59 @@
+{
+  "meta": { "company": "Acme Services Co (regression fixture)", "statement": "Profit & Loss", "basis": "Accrual",
+            "source": "Synthetic — exercises no-COGS, nested subtotal, income taxes, other expense, single+multi period" },
+  "periods": [
+    { "id": "FY2023", "label": "FY2023", "full_year": true },
+    { "id": "FY2024", "label": "FY2024", "full_year": true }
+  ],
+  "lines": [
+    { "role": "section", "label": "INCOME" },
+    { "role": "detail", "key": "rev_serv", "label": "Service revenue", "values": { "FY2023": 1000000, "FY2024": 1200000 } },
+    { "role": "detail", "key": "rev_other", "label": "Other revenue", "values": { "FY2023": 50000, "FY2024": 60000 } },
+    { "role": "subtotal", "key": "income_total", "label": "Total Income", "members": ["rev_serv", "rev_other"],
+      "stated": { "FY2023": 1050000, "FY2024": 1260000 } },
+    { "role": "blank" },
+    { "role": "section", "label": "OPERATING EXPENSES" },
+    { "role": "group_header", "label": "Payroll" },
+    { "role": "detail", "key": "salaries", "label": "Salaries", "indent": 3, "values": { "FY2023": 400000, "FY2024": 460000 } },
+    { "role": "detail", "key": "benefits", "label": "Benefits", "indent": 3, "values": { "FY2023": 60000, "FY2024": 70000 } },
+    { "role": "subtotal", "key": "payroll_total", "label": "Total Payroll", "members": ["salaries", "benefits"],
+      "stated": { "FY2023": 460000, "FY2024": 530000 } },
+    { "role": "group_header", "label": "Other operating" },
+    { "role": "detail", "key": "rent", "label": "Rent", "indent": 3, "values": { "FY2023": 80000, "FY2024": 84000 } },
+    { "role": "detail", "key": "software", "label": "Software", "indent": 3, "values": { "FY2023": 40000, "FY2024": 52000 } },
+    { "role": "subtotal", "key": "otherop_total", "label": "Total Other operating", "members": ["rent", "software"],
+      "stated": { "FY2023": 120000, "FY2024": 136000 } },
+    { "role": "subtotal", "key": "total_opex", "label": "TOTAL OPERATING EXPENSES",
+      "members": ["payroll_total", "otherop_total"], "level": 0,
+      "stated": { "FY2023": 580000, "FY2024": 666000 } },
+    { "role": "blank" },
+    { "role": "computed", "key": "op_income", "label": "Operating income",
+      "formula": ["income_total", "-", "total_opex"], "level": 0,
+      "stated": { "FY2023": 470000, "FY2024": 594000 } },
+    { "role": "blank" },
+    { "role": "section", "label": "BELOW THE LINE" },
+    { "role": "detail", "key": "interest", "label": "Interest expense", "values": { "FY2023": 20000, "FY2024": 18000 } },
+    { "role": "detail", "key": "other_exp", "label": "Loss on asset disposal", "values": { "FY2023": 5000, "FY2024": 0 } },
+    { "role": "detail", "key": "income_tax", "label": "Income taxes", "values": { "FY2023": 90000, "FY2024": 115000 } },
+    { "role": "computed", "key": "net_income", "label": "NET INCOME",
+      "formula": ["op_income", "-", "interest", "-", "other_exp", "-", "income_tax"], "level": 0, "major": true,
+      "stated": { "FY2023": 355000, "FY2024": 461000 } }
+  ],
+  "output": {
+    "revenue": "income_total",
+    "gross_profit": null,
+    "opex": [
+      { "label": "Payroll", "key": "payroll_total" },
+      { "label": "Other operating", "key": "otherop_total" }
+    ],
+    "interest": "interest",
+    "income_taxes": "income_tax",
+    "other_expense": "other_exp",
+    "net_income": "net_income"
+  },
+  "followups": [
+    { "bucket": "classification", "text": "No COGS in source — Gross Profit = Revenue. Confirm whether any delivery/hosting cost should move into COGS to create a real gross margin." },
+    { "bucket": "functional_split", "text": "Payroll is a single pooled line — need a headcount/department map to split S&M / R&D / G&A." },
+    { "bucket": "comparability", "text": "Two full years on a consistent accrual basis — YoY is apples-to-apples." }
+  ]
+}

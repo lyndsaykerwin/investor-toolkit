@@ -38,6 +38,7 @@ The agent checks for relevant skills before any task.
 - **render-market-map** — JSONL → banker-grade Excel landscape (ships a script)
 - **market-map-template-reader** — Read the Excel template's layout cheaply
 - **finance-formatting** — Bring an Excel file up to dealbook standards
+- **standardize-pnl** — Any P&L (PDF or messy Excel) → clean, audited Excel P&L with check-to-zero, margins, and follow-ups
 - **excel-to-jsonl** — Turn any spreadsheet into agent-readable JSONL
 
 **Analytics**

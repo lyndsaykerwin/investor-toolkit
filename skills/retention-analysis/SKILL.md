@@ -9,10 +9,10 @@ description: Use when the user wants an investor-grade retention analysis of rec
 
 Turn customer-level revenue into an investor-grade Excel deliverable whose every number is a live formula tracing back to the source. Change one customer's revenue in Raw Data and the whole model flexes.
 
-The deliverable is **two or three sheets**:
+The deliverable is **two or three sheets** (or, for a multi-segment company, per-segment Corkscrews + Raw Data plus a Blended Corkscrew — see "Multi-segment deliverables"):
 
 - **Corkscrew** — the rollforward (period-by-period walk: beginning → new → expansion → contraction → churn → ending) plus the derived retention metrics (GRR, NRR, Logo).
-- **Raw Data with Analysis** *(helper — present for workbook sources, skipped for tidy-CSV sources; see below)*.
+- **Raw Data with Analysis** *(helper — present for workbook sources that need transformation; skipped for tidy-CSV sources and for clean one-row-per-customer workbooks run with `--two-sheet`; see below)*.
 - **Raw Data** — a verbatim copy of the source.
 
 The deterministic work runs in the bundled Python scripts (`scripts/`), not by hand. Data can arrive wide (customers as rows, periods as columns) or long/tidy (one row per customer-period), as `.xlsx` or `.csv`.
@@ -21,12 +21,22 @@ The deterministic work runs in the bundled Python scripts (`scripts/`), not by h
 
 The helper ("Raw Data with Analysis") sits between the Corkscrew and Raw Data and gives the Corkscrew a clean, uniform grid to reference. `deliver.py` chooses automatically:
 
-- **Source is an Excel workbook → a helper is built** (three sheets). It does as much or as little as the source needs:
+- **Source is an Excel workbook needing transformation → a helper is built** (three sheets):
   - **Aggregating** — the source needs real transformation: consolidate duplicate/renamed customers, sum multiple rows per customer (one per product/plan), or filter out-of-scope revenue types. The helper does this with `SUMIFS` and carries its own self-validation rows.
-  - **1:1 pass-through** — the source already has one clean row per customer. The helper mirrors it with live references back to Raw Data and an "Excluded?" flag, normalizing the source's (often irregular) layout so the Corkscrew formulas stay uniform. It transforms nothing, but it standardizes position.
+  - **1:1 pass-through** — the source already has one clean row per customer but its layout is irregular (gaps, interspersed section/summary rows, or a single in-scope type isn't guaranteed). The helper mirrors it with live references back to Raw Data and an "Excluded?" flag, normalizing position so the Corkscrew formulas stay uniform.
+- **Source is a clean one-row-per-customer workbook → two sheets via `--two-sheet`** (Change, 2026-06). When `survey.py` confirms the customer block is **contiguous** (`customer_row_range.contiguous == true`, no section rows inside it — `section_rows_in_customer_col` empty within the block) and there is a **single in-scope revenue type**, pass `--two-sheet` to `deliver.py`. The helper is skipped and the Corkscrew references **Raw Data directly**: rollforward ranges point at `'Raw Data'!<srcMonthCol>$<first>:$<last>`, customer counts are computed inline (`COUNTIF` for active, one `SUMPRODUCT` for retained), and the external check sums the current-month column straight from Raw Data. `--two-sheet` is an **opt-in** — set it only after survey confirms the clean block; it is hard-gated to refuse when a `--source-type-col` is present (aggregation needed) or there's no Excel source. The two-sheet and three-sheet outputs produce identical Ending / GRR / NRR / Logo for the same clean source.
 - **Source is a tidy long CSV → no helper** (two sheets). With no workbook layout to normalize, the Corkscrew references Raw Data directly.
 
-So a clean single-row-per-customer **workbook still produces three sheets** (the pass-through helper). Tell the user the sheet count on that basis. (If you want a genuine two-sheet workbook deliverable, that's a future code change — today only the tidy-CSV path skips the helper.)
+So a clean single-row-per-customer **workbook produces three sheets by default, or two sheets when you pass `--two-sheet`** after a clean-block survey. Tell the user the sheet count on that basis.
+
+## Multi-segment deliverables (per-segment + Blended Corkscrew)
+
+When a company reports revenue in **distinct segments** (e.g. Metazoa = Core Enterprise + PLG Utilities), build them in **one workbook** rather than hand-stitching separate files. Use `deliver.py --segment-config <segments.json>` (preferred — unambiguous for paths/sheet names with spaces) or repeatable `--segment "Name=long.csv:src.xlsx:Sheet:custCol:firstRow:lastRow:firstDateCol:headerRow"`. With 2+ segments the pipeline produces:
+
+- **One Corkscrew + one Raw Data per segment** (`"<Name> Corkscrew"`, `"<Name> Raw Data"`), each referencing its own verbatim Raw Data directly (the two-sheet mechanism), so each segment's external check ties to its own source.
+- **A leftmost `"Blended Corkscrew"`** with a **real reconciliation**: Blended Beginning(t) and Ending(t) are the **sum of the segment Corkscrews' Beginning/Ending cells** (cross-sheet refs), and the Variance row is computed **independently** — `Blended Ending(t) − Σ_seg( SUM(segment Raw Data current-month column) × ARR_factor )` — so it is **0 every period** without ever summing the segments' own check rows. Blended retention (GRR/NRR/Logo) is computed from the blended dollar rows and Σ segment counts.
+
+All segments must share the same comparison-period count (same month range) so the blend lines up column-for-column; `deliver.py` raises if they don't. The segment config dict fields mirror the single-source `--source-*` flags: `name, long_csv, source, source_sheet, source_customer_col, source_first_data_row, source_last_data_row, source_first_date_col, source_header_row, actuals_through`.
 
 ## Engineering principles
 
@@ -69,11 +79,18 @@ Customer revenue shouldn't be negative (usually a refund or sign-flip). Scan bef
 ### 6. Raw Data sheet is preserved verbatim — no exceptions
 The Raw Data tab is an exact copy of the source: zero edits, no reformatting, no color changes, no reordering or renaming. Values, number formats, fonts, fills, borders, merged ranges, widths, heights, comments all preserved. It exists for user trust ("nothing was edited"). Apply the blue/green/black color convention only to the Corkscrew and helper sheets.
 
+**Two verbatim subtleties `deliver.py` handles (fixed 2026-06):**
+- **Theme colors.** A header fill that references a *theme* color (e.g. "accent5") carries only an index, not an RGB. The source palette is carried into the output workbook (`wb.loaded_theme` = the source's `theme1.xml`), so a magenta `accent5` (#A02B93) stays magenta instead of re-rendering as openpyxl's default-theme teal (#4BACC6). The Corkscrew/helper banners use explicit hardcoded RGB (#1F4E79 etc.), so the carried theme never changes them.
+- **Live formulas.** The source is loaded twice — `data_only=True` for layout discovery (so computed customer names / `=EOMONTH` date headers resolve to the values the scans need) and `data_only=False` for the verbatim copy (so live formulas like `=EOMONTH(B4,1)` stay formulas instead of flattening to cached values).
+
 ### 7. Formulas must be auditable — simple primitives
 A formula that takes more than five seconds to parse is functionally wrong. Prefer `COUNTIF`/`SUMIFS` over `SUMPRODUCT`; compute a metric once and pull it with `HLOOKUP` or a direct reference rather than recomputing; decompose a sum-of-parts into visible rows. Keep `SUMPRODUCT` only where it genuinely earns it: differential row-level math across two periods (customers active in both *t* and *t-12*). Exact formula syntax lives in `reference/formulas-and-layout.md`.
 
 ### 8. Cell comments on every hardcoded input
 Format `Source: [sheet]![cells], [description]`, e.g. `Source: Raw Data!B7:Q7, Customer 1 monthly MRR, Jan-25–Mar-26` or `Source: User-confirmed, MRR → annualization factor 12`. Add them as cells are populated, not at the end.
+
+### 9. NEVER merge cells — not in row 1, not anywhere in the model
+Do **not** use "Merge & Center" or `merge_cells` on any sheet you build (Corkscrew, helper, title row included). Merged cells break selection, sorting, filtering, and copy/paste, and silently corrupt formula ranges. To center a heading across columns, use `Alignment(horizontal="centerContinuous", vertical="center")` on every cell in the span, with text in the leftmost cell only — `deliver.py`'s `center_continuous_across()` already does this. The **only** place a merged range may exist is the Raw Data sheet, and only because Rule 6 copies the source verbatim — you never *create* a merge, you only preserve one that was already in the source. If you are hand-building or repairing a workbook, this rule overrides any instinct to merge a title or banner row.
 
 ---
 
@@ -181,7 +198,10 @@ Three Python scripts in `scripts/`. Run with `python3 scripts/<name>.py <args>`.
 
 - **`survey.py`** — Phase 1. Two-pass: cheap structural scan of every sheet by name + shape, then deep-inspect the top candidate (and any runner-up within 80%). Outputs interpretation hypotheses, including: the real customer-row block (`first_row`/`last_row`, excluding section/total rows by label and dataless label rows — a row counts as a customer only when its name/ID is accompanied by at least one monthly value, so the block starts at the first real customer; position-agnostic, so it works whether section rows sit above, below, or among the customers); excluded non-customer clusters separated from the data by blank rows (a top/bottom summary block — reported, never silently swallowed) and any embedded column-total row caught by summation; an actuals flag marking the current in-progress month and any later forecast columns as not-complete-actuals (`actuals_through` = last complete month, i.e. the month *before* today's); and negatives tagged customer-row (needs a user decision) vs section-row (expected). `python3 scripts/survey.py <path> [--json]`
 - **`compute.py`** — OPTIONAL independent cross-check. Recomputes the metrics in Python and runs a 7-layer self-check. The deliverable does **not** depend on it — `deliver.py` builds the workbook independently from the CSV. **Pass `--lookback` matching `deliver.py`** (default 12 = YoY): its `rollforward`/`metrics` keys then equal the Corkscrew period-for-period (verified against a real recalc), while `monthly`/`metrics_ltm` give MoM and LTM-cohort views. Run it to validate the numbers a second way, not as a required pipeline stage. `python3 scripts/compute.py <csv> [--arr-factor 12] [--lookback 12] [--output result.json] [--self-test]`
-- **`deliver.py`** — builds the workbook (two- or three-sheet, mode chosen automatically) per the layout/formatting in `reference/`. Takes the ARR factor directly; `--compute-json` is optional (if given, its factor overrides `--arr-factor`); `--lookback` sets the comparison basis (default 12 = YoY, 1 = MoM). `python3 scripts/deliver.py <long.csv> <out.xlsx> --arr-factor 12 [--lookback 12] [--source <src.xlsx> --source-sheet "Raw Data" --source-customer-col B --source-first-data-row 8 --source-last-data-row 17 --source-first-date-col C --actuals-through 2026-05 --source-type-col D --type-filter "Recurring,Re-occurring"]`
+- **`deliver.py`** — builds the workbook (two- or three-sheet, mode chosen automatically; multi-segment when ≥2 segments are declared) per the layout/formatting in `reference/`. Takes the ARR factor directly; `--compute-json` is optional (if given, its factor overrides `--arr-factor`); `--lookback` sets the comparison basis (default 12 = YoY, 1 = MoM). `python3 scripts/deliver.py <long.csv> <out.xlsx> --arr-factor 12 [--lookback 12] [--source <src.xlsx> --source-sheet "Raw Data" --source-customer-col B --source-first-data-row 8 --source-last-data-row 17 --source-first-date-col C --actuals-through 2026-05 --source-type-col D --type-filter "Recurring,Re-occurring"]`
+  - **`--two-sheet`** (Change, 2026-06) — skip the pass-through helper and reference Raw Data directly (2 sheets: Corkscrew + Raw Data). Opt-in; pass only after `survey.py` confirms a clean contiguous one-row-per-customer block with a single in-scope type. Hard-gated to refuse with a `--source-type-col` (aggregation) or no Excel source.
+  - **`--segment-config <segments.json>`** / repeatable **`--segment "Name=long.csv[:src.xlsx:Sheet:custCol:firstRow:lastRow:firstDateCol:headerRow]"`** (Change, 2026-06) — declare ≥2 segments to build per-segment Corkscrews + Raw Data plus a Blended Corkscrew (blended variance = 0 every period). Prefer the JSON config for paths/sheet names containing spaces or colons. See "Multi-segment deliverables."
+  - **`--self-test`** — `python3 scripts/deliver.py --self-test` builds synthetic fixtures in a temp dir and verifies the three 2026-06 changes (theme+formula verbatim, two-sheet path, multi-segment blend). The two-sheet and blended checks recalc with LibreOffice when available and assert the external/variance checks = 0 every period; they print SKIP if LibreOffice isn't installed.
 
   **`--source` contract — what passthrough/aggregating mode DOES and does NOT handle (read before relying on it):**
   - **Customer block bounds:** scanned from `--source-first-data-row` to `--source-last-data-row` (and down to the first blank / sheet max if the latter is omitted). Set **`--source-first-data-row`** to the first customer (skips a summary block ABOVE) and **`--source-last-data-row`** to the last customer (excludes a summary/total block BELOW). Feed both straight from survey's `customer_row_range`.
@@ -196,8 +216,9 @@ Each script has a built-in self-test: `python3 scripts/<name>.py --self-test` (s
 ## Final Checklist
 
 - [ ] Scope confirmed via one upfront consolidated question (Phase 1)
-- [ ] Sheets: Corkscrew + Raw Data, plus the helper *only if* the raw data needed transformation
-- [ ] **Raw Data sheet is a verbatim copy — no edits, no reformatting, no color changes**
+- [ ] Sheets: Corkscrew + Raw Data, plus the helper *only if* the raw data needed transformation (or 2 sheets via `--two-sheet` for a clean block; or per-segment + Blended for multi-segment)
+- [ ] **Raw Data sheet is a verbatim copy — no edits, no reformatting, no color changes** (source theme palette carried so theme colors keep their RGB; live formulas preserved)
+- [ ] Multi-segment only: per-segment external checks = 0 AND Blended Variance row = 0 every period
 - [ ] All Corkscrew formulas live (no hardcoded sums or rates)
 - [ ] Corkscrew external check = 0 in every period (vs Raw Data or pre-validated helper)
 - [ ] Helper self-validation rows = 0 (if a helper was built)

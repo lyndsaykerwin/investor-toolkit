@@ -12,6 +12,19 @@ A note used throughout: formulas reference the **helper sheet ("Raw Data with
 Analysis") if one was built, otherwise Raw Data directly**. The helper is
 optional — see SKILL.md "When the helper sheet is needed."
 
+Three referencing modes (`write_corkscrew_sheet_aggregating`):
+- **Helper mode** (`raw_geometry=None`) — rollforward ranges point at the helper's
+  canonical grid (customer rows from row 12, months from col B); customer counts
+  come via `HLOOKUP` into the helper's summary rows 2/3.
+- **Two-sheet mode** (`raw_geometry={sheet,first_row,last_row,first_date_col_idx}`,
+  the `--two-sheet` path) — no helper; rollforward ranges and the external check
+  reference **Raw Data directly** at the *source* block geometry, and customer
+  counts are computed **inline** (`COUNTIF` for active, one `SUMPRODUCT` for
+  retained) instead of `HLOOKUP`. See "Two-sheet (no-helper) referencing" below.
+- **Blended mode** (`write_blended_corkscrew`) — sums per-segment Corkscrew cells
+  and reconciles independently against each segment's Raw Data. See "Blended
+  Corkscrew" below.
+
 ---
 
 ## Corkscrew sheet layout
@@ -176,6 +189,65 @@ GRR    =IFERROR((<col>8 + <col>11 + <col>12) / <col>8, 0)
 NRR    =IFERROR((<col>8 + <col>10 + <col>11 + <col>12) / <col>8, 0)
 Logo   =IFERROR((<col>17 - <col>19) / <col>17, 0)
 ```
+
+---
+
+## Two-sheet (no-helper) referencing — `--two-sheet`
+
+In the two-sheet path there is no helper, so the Corkscrew references **Raw Data
+directly** at the *source* block geometry passed in `raw_geometry`:
+
+- `first_row` / `last_row` — the source customer block (e.g. rows 5–162 for
+  Metazoa's Core Enterprise sheet).
+- `first_date_col_idx` — 1-based column index of the source's first month column
+  (e.g. column B = 2). Month index `i` → `get_column_letter(first_date_col_idx + i)`.
+
+The rollforward ranges become `'Raw Data'!<curr>$<first_row>:<curr>$<last_row>`
+and `'Raw Data'!<prior>...` (same `SUMPRODUCT` shapes as helper mode — only the
+sheet and range bounds change). The customer counts, which in helper mode are
+`HLOOKUP`s into the helper's summary rows, are computed **inline** against Raw
+Data:
+
+```
+# Active prior    =COUNTIF('Raw Data'!<prior>$<first>:<prior>$<last>,">0")
+# Active current  =COUNTIF('Raw Data'!<curr>$<first>:<curr>$<last>,">0")
+# Retained        SUMPRODUCT(('Raw Data'!<curr>...>0)*('Raw Data'!<prior>...>0))
+                  (the one legitimate SUMPRODUCT — differential across two periods)
+# Churned         = # Active prior  − Retained
+# New             = # Active current − Retained
+```
+
+The single-type external check (row 14) sums the current-month column straight
+from Raw Data: `=Ending − SUM('Raw Data'!<curr>$<first>:<curr>$<last>) × $ARR_factor`.
+This path is valid **only** for a clean contiguous single-type block — survey-gated
+and opt-in (see SKILL.md). It produces identical Ending / GRR / NRR / Logo to the
+three-sheet pass-through for the same clean source.
+
+---
+
+## Blended Corkscrew (multi-segment) — `write_blended_corkscrew`
+
+For a multi-segment workbook, each segment gets its own two-sheet Corkscrew + Raw
+Data, and a leftmost **Blended Corkscrew** ties them together with a *real*
+reconciliation (never by summing the segments' own check rows):
+
+```
+Blended Beginning(t)  = Σ_seg  '<seg> Corkscrew'!<col>8
+Blended New/Up/Down/Churn(t) = Σ_seg  '<seg> Corkscrew'!<col>{9,10,11,12}
+Blended Ending(t)     = Σ_seg  '<seg> Corkscrew'!<col>13
+Blended counts(t)     = Σ_seg  '<seg> Corkscrew'!<col>{17,18,19,20}
+
+Variance(t) [row 14, must = 0 every period]
+    = Blended Ending(t)
+      − ( Σ_seg SUM('<seg> Raw Data'!<curr month col>$<first>:$<last>) ) × $ARR_factor
+```
+
+The Variance right-hand side is an **independent path** straight from each
+segment's Raw Data — it never references the per-segment `Beginning+moves=Ending`
+identity — so `Variance == 0` every period proves the blend ties back to source.
+Blended GRR/NRR/Logo are computed from the blended dollar rows and Σ counts. All
+segments must share the same comparison-period count (same month range) so columns
+line up; `deliver_segments()` raises otherwise.
 
 ---
 

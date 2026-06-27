@@ -49,6 +49,7 @@ import argparse
 import csv
 import datetime as dt
 import json
+import os
 import sys
 from copy import copy as _copy
 from typing import Any, Dict, List, Tuple
@@ -274,11 +275,18 @@ def fmt_month_label(month_str: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def copy_source_sheet_verbatim(src_path: str, src_ws, dest_ws) -> None:
+def copy_source_sheet_verbatim(src_path: str, src_ws, dest_ws,
+                               src_ws_formulas=None) -> None:
     """Copy a source worksheet (or CSV) into dest_ws preserving values, number
     formats, fonts, fills, alignment, borders, merged ranges, column widths,
     row heights, and cell comments. Critical Rule 7: zero edits, no
-    reformatting, no color changes."""
+    reformatting, no color changes.
+
+    Change #1 (formula verbatim): when `src_ws_formulas` (a data_only=False load
+    of the same sheet) is supplied, each cell's VALUE is taken from it so live
+    formulas (e.g. =EOMONTH(B4,1)) are preserved as formulas instead of being
+    flattened to their cached values. Styles still come from `src_ws`. Theme
+    colors are carried separately via wb.loaded_theme in deliver()."""
     if src_path.lower().endswith(".csv"):
         with open(src_path, "r", encoding="utf-8") as fh:
             reader = csv.reader(fh)
@@ -299,10 +307,15 @@ def copy_source_sheet_verbatim(src_path: str, src_ws, dest_ws) -> None:
 
     for row in src_ws.iter_rows():
         for cell in row:
-            if cell.value is None and not cell.has_style:
+            # Value comes from the formula load when available (preserves live
+            # formulas); style metadata always comes from `cell` (data_only).
+            fcell = (src_ws_formulas.cell(row=cell.row, column=cell.column)
+                     if src_ws_formulas is not None else cell)
+            val = fcell.value
+            if val is None and not cell.has_style:
                 continue
             dest_cell = dest_ws.cell(row=cell.row, column=cell.column,
-                                     value=cell.value)
+                                     value=val)
             if cell.has_style:
                 dest_cell.font = _copy(cell.font)
                 dest_cell.fill = _copy(cell.fill)
@@ -613,18 +626,54 @@ def write_corkscrew_sheet_aggregating(
     in_scope_types: List[str],
     analysis_sheet_name: str,
     lookback: int = 12,
+    raw_geometry: dict | None = None,
 ) -> None:
     """Write the Corkscrew with YoY rollforward (or N-period lookback).
+
+    Two referencing modes:
+    - HELPER mode (raw_geometry=None, default): rollforward ranges point at the
+      `analysis_sheet_name` helper at its fixed canonical geometry (customer rows
+      from ANALYSIS_FIRST_CUST_ROW, months from ANALYSIS_FIRST_MONTH_COL), and
+      customer counts come via HLOOKUP into the helper's summary rows 2/3.
+    - TWO-SHEET mode (raw_geometry given, Change #2): no helper exists; the
+      Corkscrew references Raw Data directly. `raw_geometry` carries the source
+      block geometry as written into Raw Data verbatim:
+        {sheet, first_row, last_row, first_date_col_idx}
+      Rollforward ranges become 'Raw Data'!<srcMonthCol>$<first>:$<last>; customer
+      counts are computed INLINE (COUNTIF / SUMPRODUCT) against Raw Data rather
+      than pulled from a helper. Only valid for a clean contiguous single-type
+      block (the caller gates this).
+
     All movement formulas reference the Raw Data with Analysis prior and current
     columns. Multi-type recon block written when len(in_scope_types) > 1."""
     n_months = len(months_analysis)
     n_cust = len(customers)
-    last_cust_row = ANALYSIS_FIRST_CUST_ROW + n_cust - 1
     n_periods = n_months - lookback  # number of comparison periods
     if n_periods <= 0:
         raise ValueError(
             f"Not enough months for {lookback}-period lookback: {n_months} months."
         )
+
+    # Geometry the rollforward formulas reference. HELPER mode uses the canonical
+    # helper grid; TWO-SHEET mode (Change #2) uses the source block as written
+    # into Raw Data verbatim.
+    if raw_geometry is not None:
+        ref_sheet = raw_geometry["sheet"]            # e.g. "Raw Data"
+        ref_first_row = raw_geometry["first_row"]    # source first customer row
+        ref_last_row = raw_geometry["last_row"]      # source last customer row
+        ref_first_date_idx = raw_geometry["first_date_col_idx"]  # 1-based col idx
+
+        def month_col_letter(month_index: int) -> str:
+            return get_column_letter(ref_first_date_idx + month_index)
+    else:
+        ref_sheet = analysis_sheet_name
+        ref_first_row = ANALYSIS_FIRST_CUST_ROW
+        ref_last_row = ANALYSIS_FIRST_CUST_ROW + n_cust - 1
+
+        def month_col_letter(month_index: int) -> str:
+            return get_column_letter(ANALYSIS_FIRST_MONTH_COL + month_index)
+
+    last_cust_row = ref_last_row  # used by HLOOKUP header ranges (helper mode)
 
     months_periods = months_analysis[lookback:]  # comparison-period labels
 
@@ -704,20 +753,16 @@ def write_corkscrew_sheet_aggregating(
         if r in (ROW_BEGIN, ROW_END):
             c.fill = fill(KEY_METRIC_FILL)
 
-    # Helper: analysis sheet column letter for a given source month index
-    def analysis_col(month_index: int) -> str:
-        return get_column_letter(ANALYSIS_FIRST_MONTH_COL + month_index)
-
     for j in range(n_periods):
         col = FIRST_DATA_COL + j
         col_letter = get_column_letter(col)
-        curr_idx = lookback + j           # analysis sheet column for current period
-        prior_idx = j                     # analysis sheet column for prior period
-        curr = analysis_col(curr_idx)
-        prior = analysis_col(prior_idx)
-        # Analysis sheet data ranges
-        rc = f"'{analysis_sheet_name}'!{curr}${ANALYSIS_FIRST_CUST_ROW}:{curr}${last_cust_row}"
-        rp = f"'{analysis_sheet_name}'!{prior}${ANALYSIS_FIRST_CUST_ROW}:{prior}${last_cust_row}"
+        curr_idx = lookback + j           # source month index for current period
+        prior_idx = j                     # source month index for prior period
+        curr = month_col_letter(curr_idx)
+        prior = month_col_letter(prior_idx)
+        # Reference-sheet data ranges (helper grid OR Raw Data block)
+        rc = f"'{ref_sheet}'!{curr}${ref_first_row}:{curr}${ref_last_row}"
+        rp = f"'{ref_sheet}'!{prior}${ref_first_row}:{prior}${ref_last_row}"
 
         # Beginning ARR = SUMPRODUCT((prior > 0) * prior) * ARR_factor
         f_beg = f"=SUMPRODUCT(({rp}>0)*{rp})*{arr_ref}"
@@ -759,24 +804,36 @@ def write_corkscrew_sheet_aggregating(
         c.number_format = FMT_DOLLAR  # bottom of block — $
         c.fill = fill(KEY_METRIC_FILL)
 
-        # Customer counts via HLOOKUP into analysis sheet row 2
-        analysis_hdr_range = (f"'{analysis_sheet_name}'!"
-                          f"$B${ANALYSIS_ROW_HDR}:${get_column_letter(ANALYSIS_FIRST_MONTH_COL + n_months - 1)}${ANALYSIS_ROW_ACTIVE}")
-        f_n_prior = f"=HLOOKUP(SUBSTITUTE({col_letter}${ROW_VS},\"vs \",\"\"),{analysis_hdr_range},2,FALSE)"
-        f_n_curr = f"=HLOOKUP({col_letter}${ROW_DATES},{analysis_hdr_range},2,FALSE)"
-        ws.cell(row=ROW_N_ACTIVE_PRIOR, column=col, value=f_n_prior).font = font_xsheet()
-        ws.cell(row=ROW_N_ACTIVE_PRIOR, column=col).number_format = FMT_COUNT
-        ws.cell(row=ROW_N_ACTIVE_CURR, column=col, value=f_n_curr).font = font_xsheet()
-        ws.cell(row=ROW_N_ACTIVE_CURR, column=col).number_format = FMT_COUNT
+        # Customer counts.
+        if raw_geometry is not None:
+            # TWO-SHEET mode: compute inline against Raw Data (no helper summary
+            # rows to HLOOKUP). One COUNTIF per active count; the retained count
+            # is the single legitimate SUMPRODUCT (differential across periods).
+            f_n_prior = f"=COUNTIF({rp},\">0\")"
+            f_n_curr = f"=COUNTIF({rc},\">0\")"
+            f_retained_expr = f"SUMPRODUCT(({rc}>0)*({rp}>0))"
+            ws.cell(row=ROW_N_ACTIVE_PRIOR, column=col, value=f_n_prior).font = font_xsheet()
+            ws.cell(row=ROW_N_ACTIVE_CURR, column=col, value=f_n_curr).font = font_xsheet()
+            f_n_ch = f"={col_letter}{ROW_N_ACTIVE_PRIOR} - {f_retained_expr}"
+            f_n_new = f"={col_letter}{ROW_N_ACTIVE_CURR} - {f_retained_expr}"
+        else:
+            # HELPER mode: HLOOKUP into the helper's summary rows 2/3.
+            analysis_hdr_range = (f"'{analysis_sheet_name}'!"
+                              f"$B${ANALYSIS_ROW_HDR}:${get_column_letter(ANALYSIS_FIRST_MONTH_COL + n_months - 1)}${ANALYSIS_ROW_ACTIVE}")
+            f_n_prior = f"=HLOOKUP(SUBSTITUTE({col_letter}${ROW_VS},\"vs \",\"\"),{analysis_hdr_range},2,FALSE)"
+            f_n_curr = f"=HLOOKUP({col_letter}${ROW_DATES},{analysis_hdr_range},2,FALSE)"
+            ws.cell(row=ROW_N_ACTIVE_PRIOR, column=col, value=f_n_prior).font = font_xsheet()
+            ws.cell(row=ROW_N_ACTIVE_CURR, column=col, value=f_n_curr).font = font_xsheet()
+            analysis_ret_range = (f"'{analysis_sheet_name}'!"
+                              f"$B${ANALYSIS_ROW_HDR}:${get_column_letter(ANALYSIS_FIRST_MONTH_COL + n_months - 1)}${ANALYSIS_ROW_RETAINED}")
+            f_retained = f"=HLOOKUP({col_letter}${ROW_DATES},{analysis_ret_range},3,FALSE)"
+            f_n_ch = f"={col_letter}{ROW_N_ACTIVE_PRIOR} - {f_retained[1:]}"  # = prior − retained
+            f_n_new = f"={col_letter}{ROW_N_ACTIVE_CURR} - {f_retained[1:]}"  # = current − retained
 
-        # Retained — pull from analysis sheet row 3
-        analysis_ret_range = (f"'{analysis_sheet_name}'!"
-                          f"$B${ANALYSIS_ROW_HDR}:${get_column_letter(ANALYSIS_FIRST_MONTH_COL + n_months - 1)}${ANALYSIS_ROW_RETAINED}")
-        f_retained = f"=HLOOKUP({col_letter}${ROW_DATES},{analysis_ret_range},3,FALSE)"
-        f_n_ch = f"={col_letter}{ROW_N_ACTIVE_PRIOR} - {f_retained[1:]}"  # = prior − retained
+        ws.cell(row=ROW_N_ACTIVE_PRIOR, column=col).number_format = FMT_COUNT
+        ws.cell(row=ROW_N_ACTIVE_CURR, column=col).number_format = FMT_COUNT
         ws.cell(row=ROW_N_CHURNED, column=col, value=f_n_ch).font = font_formula()
         ws.cell(row=ROW_N_CHURNED, column=col).number_format = FMT_COUNT
-        f_n_new = f"={col_letter}{ROW_N_ACTIVE_CURR} - {f_retained[1:]}"  # = current − retained
         ws.cell(row=ROW_N_NEW, column=col, value=f_n_new).font = font_formula()
         ws.cell(row=ROW_N_NEW, column=col).number_format = FMT_COUNT
 
@@ -1100,6 +1157,7 @@ def deliver(
     source_header_row: int | None = None,
     source_last_data_row: int | None = None,
     actuals_through: str | None = None,
+    two_sheet: bool = False,
 ) -> str:
     customers, months, cell = load_long_csv(long_csv_path)
 
@@ -1133,9 +1191,34 @@ def deliver(
     elif source_path:
         mode = "passthrough"
 
-    # Load the source workbook ONCE (was previously re-read up to 4x). Reused
-    # for the verbatim Raw Data copy and every layout-discovery scan below.
-    src_ws = None
+    # Change #2 — two-sheet / no-helper path. Opt-in (--two-sheet), and ONLY
+    # valid for a clean passthrough source (one contiguous row per customer, a
+    # single in-scope revenue type). The caller sets the flag after survey.py
+    # confirms a clean contiguous block; here we hard-gate so a misuse fails
+    # loudly rather than silently shipping a wrong file.
+    if two_sheet:
+        if not source_path or source_path.lower().endswith(".csv"):
+            raise ValueError(
+                "--two-sheet needs an Excel --source (it references Raw Data "
+                "directly). For a tidy CSV the two-sheet layout is already the "
+                "default."
+            )
+        if source_type_col:
+            raise ValueError(
+                "--two-sheet is incompatible with --source-type-col: a type "
+                "column means aggregation is needed, which requires the helper "
+                "sheet. Drop --two-sheet or drop the type column."
+            )
+        mode = "twosheet"
+
+    # Load the source workbook for layout discovery (data_only=True so computed
+    # customer names / date headers like ="Customer "&ROW() and =EOMONTH(...)
+    # resolve to the values the scans need). A SECOND data_only=False load
+    # supplies the verbatim Raw Data copy so formulas survive (Change #1) — the
+    # data_only worksheet would hand us cached values, flattening live formulas.
+    src_ws = None          # values (discovery)
+    src_ws_formulas = None  # formula strings (verbatim copy)
+    src_theme = None        # source theme1.xml bytes (verbatim theme colors)
     if source_path and not source_path.lower().endswith(".csv"):
         _src_wb = load_workbook(source_path, data_only=True, read_only=False)
         if source_sheet is None or source_sheet not in _src_wb.sheetnames:
@@ -1144,6 +1227,16 @@ def deliver(
                 f"Available: {_src_wb.sheetnames}"
             )
         src_ws = _src_wb[source_sheet]
+        _src_wb_f = load_workbook(source_path, data_only=False, read_only=False)
+        src_ws_formulas = _src_wb_f[source_sheet]
+        # Carry the SOURCE theme palette so theme-indexed colors (e.g. a header
+        # fill referencing accent5 = #A02B93) render with the source's resolved
+        # RGB instead of openpyxl's default theme (which would re-render teal).
+        # Corkscrew/helper banners use explicit hardcoded RGB, so this does NOT
+        # change them.
+        src_theme = _src_wb_f.loaded_theme
+    if src_theme is not None:
+        wb.loaded_theme = src_theme
 
     if mode == "aggregating":
         # Three sheets: Corkscrew, Raw Data with Analysis, Raw Data
@@ -1151,7 +1244,7 @@ def deliver(
         ws_raw = wb.create_sheet("Raw Data")
 
         # 1. Raw Data — verbatim
-        copy_source_sheet_verbatim(source_path, src_ws, ws_raw)
+        copy_source_sheet_verbatim(source_path, src_ws, ws_raw, src_ws_formulas)
 
         # 2. Discover source layout. An explicit --source-last-data-row wins over
         # auto-detection (#3) — caps the customer block so a summary/total block
@@ -1200,7 +1293,7 @@ def deliver(
     elif mode == "passthrough":
         ws_helper = wb.create_sheet("Raw Data with Analysis")
         ws_raw = wb.create_sheet("Raw Data")
-        copy_source_sheet_verbatim(source_path, src_ws, ws_raw)
+        copy_source_sheet_verbatim(source_path, src_ws, ws_raw, src_ws_formulas)
 
         customer_to_src_row = build_customer_to_src_row_map(
             source_path, source_customer_col, source_first_data_row, src_ws,
@@ -1231,6 +1324,44 @@ def deliver(
             lookback=lookback,
         )
 
+    elif mode == "twosheet":
+        # Change #2 — two sheets only: Corkscrew + Raw Data (verbatim). No
+        # helper. The Corkscrew references Raw Data directly via raw_geometry.
+        ws_raw = wb.create_sheet("Raw Data")
+        copy_source_sheet_verbatim(source_path, src_ws, ws_raw, src_ws_formulas)
+
+        # Determine the source customer block bounds written into Raw Data.
+        src_last_row = source_last_data_row or find_source_last_data_row(
+            src_ws, source_customer_col, source_first_data_row
+        )
+        # Months iterated by the corkscrew = source month headers (honoring the
+        # actuals cutoff). They live in Raw Data starting at source_first_date_col,
+        # so index 0 = source_first_date_col, index 1 = next column, etc.
+        months_ts = get_source_months(
+            src_ws, source_first_date_col, header_row=source_header_row,
+        ) or months
+        if actuals_through:
+            months_ts = [m for m in months_ts
+                         if m <= parse_month_cutoff(actuals_through)]
+
+        raw_geometry = {
+            "sheet": "Raw Data",
+            "first_row": source_first_data_row,
+            "last_row": src_last_row,
+            "first_date_col_idx": column_index_from_string(source_first_date_col),
+        }
+        write_corkscrew_sheet_aggregating(
+            ws_cork,
+            customers=customers,
+            months_analysis=months_ts,
+            arr_factor=arr_factor,
+            company=company,
+            in_scope_types=["Recurring"],  # single-type bucket by gate
+            analysis_sheet_name="Raw Data",
+            lookback=lookback,
+            raw_geometry=raw_geometry,
+        )
+
     else:
         # twotab
         ws_raw = wb.create_sheet("Raw Data")
@@ -1250,9 +1381,674 @@ def deliver(
     return output_xlsx_path
 
 
+# ---------------------------------------------------------------------------
+# Multi-segment (Change #3)
+# ---------------------------------------------------------------------------
+
+
+def write_blended_corkscrew(
+    ws,
+    seg_specs: List[dict],
+    n_periods: int,
+    months_periods: List[str],
+    months_prior: List[str],
+    arr_factor: float,
+    company: str,
+) -> None:
+    """Write the Blended Corkscrew.
+
+    Each `seg_specs` entry carries the per-segment Corkscrew sheet name plus the
+    geometry of that segment's Raw Data block (sheet, first_row, last_row,
+    first_date_col_idx, lookback) so the blended sheet can compute an INDEPENDENT
+    reconciliation.
+
+    Real reconciliation (not summing the segments' own check rows):
+      * Blended Beginning(t) = Σ  '<seg> Corkscrew'!<col>ROW_BEGIN
+      * Blended Ending(t)    = Σ  '<seg> Corkscrew'!<col>ROW_END
+        (New/Upsell/Downsell/Churn likewise summed so the rollforward identity holds)
+      * Variance(t) = Blended Ending(t)
+                      − Σ_seg( SUM('<seg> Raw Data'!<curr month col over its rows>) × factor )
+        The right-hand side is an INDEPENDENT path straight from each segment's
+        Raw Data — it never references the segment Beginning+moves=Ending identity
+        — so Variance == 0 every period proves the blend ties to source.
+    Blended retention is computed from the blended dollar rows and Σ counts."""
+    arr_ref = f"$B${ROW_ARR_FACTOR}"
+
+    # Title + ARR factor + date rows (same shape as a segment corkscrew).
+    title_text = (f"{company} — Blended ARR Corkscrew & Retention Analysis"
+                  if company else "Blended ARR Corkscrew & Retention Analysis")
+    center_continuous_across(ws, ROW_TITLE, 1, FIRST_DATA_COL + n_periods - 1,
+                             title_text, font_title(), fill(TITLE_FILL))
+    ws.row_dimensions[ROW_TITLE].height = 22
+    ws.cell(row=ROW_GENERATED, column=1, value="Generated:").font = font_subheader()
+    ws.cell(row=ROW_GENERATED, column=2, value=dt.date.today().isoformat()).font = font_hardcode()
+    ws.cell(row=ROW_ARR_FACTOR, column=1, value="ARR Factor (MRR × N):").font = font_subheader()
+    af = ws.cell(row=ROW_ARR_FACTOR, column=2, value=int(arr_factor))
+    af.font = font_hardcode(bold=True); af.number_format = "0"
+
+    lbl5 = ws.cell(row=ROW_DATES, column=COL_LABEL, value="Item")
+    lbl5.font = font_banner(); lbl5.fill = fill(BANNER_FILL)
+    lbl5.alignment = Alignment(horizontal="left")
+    for j, m in enumerate(months_periods):
+        c = ws.cell(row=ROW_DATES, column=FIRST_DATA_COL + j, value=fmt_month_label(m))
+        c.font = font_banner(); c.fill = fill(BANNER_FILL)
+        c.alignment = Alignment(horizontal="center")
+    vs = ws.cell(row=ROW_VS, column=COL_LABEL, value="(vs. prior year)")
+    vs.font = font_subheader(); vs.fill = fill(SUBHEADER_FILL)
+    for j, m in enumerate(months_prior):
+        c = ws.cell(row=ROW_VS, column=FIRST_DATA_COL + j, value=f"vs {fmt_month_label(m)}")
+        c.font = font_subheader(); c.fill = fill(SUBHEADER_FILL)
+        c.alignment = Alignment(horizontal="center")
+
+    rollforward_labels = {
+        ROW_BEGIN: ("Beginning ARR (prior year)", True),
+        ROW_NEW: ("  + New customer ARR", False),
+        ROW_UPSELL: ("  + Expansion (Upsell)", False),
+        ROW_DOWNSELL: ("  - Contraction (Downsell)", False),
+        ROW_CHURN: ("  - Churn", False),
+        ROW_END: ("Ending ARR", True),
+    }
+    for r, (lbl, _) in rollforward_labels.items():
+        c = ws.cell(row=r, column=COL_LABEL, value=lbl)
+        c.font = font_subheader(); c.alignment = Alignment(horizontal="left")
+        if r in (ROW_BEGIN, ROW_END):
+            c.fill = fill(KEY_METRIC_FILL)
+
+    summed_rows = (ROW_BEGIN, ROW_NEW, ROW_UPSELL, ROW_DOWNSELL, ROW_CHURN)
+    count_rows = (ROW_N_ACTIVE_PRIOR, ROW_N_ACTIVE_CURR, ROW_N_CHURNED, ROW_N_NEW)
+
+    for j in range(n_periods):
+        col = FIRST_DATA_COL + j
+        col_letter = get_column_letter(col)
+
+        # Blended rollforward movement rows = Σ segment corkscrew cells.
+        for r in summed_rows:
+            parts = [f"'{s['corkscrew_sheet']}'!{col_letter}{r}" for s in seg_specs]
+            f = "=" + "+".join(parts)
+            c = ws.cell(row=r, column=col, value=f)
+            c.font = font_xsheet(bold=(r == ROW_BEGIN))
+            c.number_format = FMT_DOLLAR if r == ROW_BEGIN else FMT_NUMBER
+            if r == ROW_BEGIN:
+                c.fill = fill(KEY_METRIC_FILL)
+
+        # Blended Ending = Σ segment Ending (cross-sheet refs).
+        end_parts = [f"'{s['corkscrew_sheet']}'!{col_letter}{ROW_END}" for s in seg_specs]
+        c = ws.cell(row=ROW_END, column=col, value="=" + "+".join(end_parts))
+        c.font = font_xsheet(bold=True); c.number_format = FMT_DOLLAR
+        c.fill = fill(KEY_METRIC_FILL)
+
+        # INDEPENDENT variance: Blended Ending − Σ_seg(SUM(seg Raw Data curr col)×factor).
+        indep_terms = []
+        for s in seg_specs:
+            curr_letter = get_column_letter(s["first_date_col_idx"] + s["lookback"] + j)
+            indep_terms.append(
+                f"SUM('{s['raw_sheet']}'!{curr_letter}{s['first_row']}:"
+                f"{curr_letter}{s['last_row']})")
+        indep = "+".join(indep_terms)
+        f_var = f"={col_letter}{ROW_END}-({indep})*{arr_ref}"
+        cv = ws.cell(row=ROW_CHECK, column=col, value=f_var)
+        cv.font = font_xsheet(); cv.number_format = FMT_NUMBER
+
+        # Blended counts = Σ segment counts.
+        for r in count_rows:
+            parts = [f"'{s['corkscrew_sheet']}'!{col_letter}{r}" for s in seg_specs]
+            c = ws.cell(row=r, column=col, value="=" + "+".join(parts))
+            c.font = font_xsheet(); c.number_format = FMT_COUNT
+
+        # Blended retention from blended dollar rows + Σ counts.
+        beg = f"{col_letter}{ROW_BEGIN}"
+        ws.cell(row=ROW_GRR, column=col,
+                value=f"=IFERROR(({beg}+{col_letter}{ROW_DOWNSELL}+{col_letter}{ROW_CHURN})/{beg},0)"
+                ).number_format = FMT_PCT
+        ws.cell(row=ROW_NRR, column=col,
+                value=f"=IFERROR(({beg}+{col_letter}{ROW_UPSELL}+{col_letter}{ROW_DOWNSELL}+{col_letter}{ROW_CHURN})/{beg},0)"
+                ).number_format = FMT_PCT
+        ws.cell(row=ROW_LOGO, column=col,
+                value=f"=IFERROR(({col_letter}{ROW_N_ACTIVE_PRIOR}-{col_letter}{ROW_N_CHURNED})/{col_letter}{ROW_N_ACTIVE_PRIOR},0)"
+                ).number_format = FMT_PCT
+        for r in (ROW_GRR, ROW_NRR, ROW_LOGO):
+            ws.cell(row=r, column=col).font = font_formula()
+
+    # Banners + labels.
+    for row, txt in ((ROW_CC_BANNER, "CUSTOMER COUNTS"),
+                     (ROW_RR_BANNER, "RETENTION RATES")):
+        center_continuous_across(ws, row, 1, FIRST_DATA_COL + n_periods - 1,
+                                 txt, font_banner(), fill(BANNER_FILL))
+    labels = {
+        ROW_CHECK: "Blended Variance vs Source (= 0)",
+        ROW_N_ACTIVE_PRIOR: "# Active (prior period)",
+        ROW_N_ACTIVE_CURR: "# Active (current period)",
+        ROW_N_CHURNED: "# Churned",
+        ROW_N_NEW: "# New",
+        ROW_GRR: "Gross Dollar Retention (GRR)",
+        ROW_NRR: "Net Dollar Retention (NRR)",
+        ROW_LOGO: "Logo Retention",
+    }
+    for r, txt in labels.items():
+        c = ws.cell(row=r, column=COL_LABEL, value=txt)
+        c.font = font_subheader(); c.alignment = Alignment(horizontal="left")
+
+    ws.column_dimensions[get_column_letter(COL_LABEL)].width = 38
+    for j in range(n_periods):
+        ws.column_dimensions[get_column_letter(FIRST_DATA_COL + j)].width = 13
+    ws.freeze_panes = ws.cell(row=ROW_DATES + 2, column=FIRST_DATA_COL)
+
+
+def deliver_segments(
+    segments: List[dict],
+    output_xlsx_path: str,
+    arr_factor: float = 12.0,
+    company: str = "",
+    lookback: int = 12,
+) -> str:
+    """Build a multi-segment workbook (Change #3): one Corkscrew + one Raw Data
+    per segment, plus a Blended Corkscrew with a real (independent) reconciliation.
+
+    Each `segments` entry is a dict:
+      {name, long_csv,
+       source, source_sheet, source_customer_col, source_first_data_row,
+       source_last_data_row, source_first_date_col, source_header_row,
+       actuals_through}
+    A segment with an Excel `source` gets a verbatim Raw Data sheet and a
+    Corkscrew that references it directly (two-sheet style). A segment with only
+    a `long_csv` gets a CSV-built Raw Data sheet. All segments must share the same
+    comparison-period count so the blend lines up column-for-column."""
+    if len(segments) < 2:
+        raise ValueError("deliver_segments needs >= 2 segments; use deliver() for one.")
+
+    wb = Workbook()
+    # Drop the default sheet; we create named sheets per segment.
+    default_ws = wb.active
+
+    seg_specs: List[dict] = []
+    period_counts = set()
+    blended_company = company
+
+    for seg in segments:
+        name = seg["name"]
+        cork_name = f"{name} Corkscrew"
+        raw_name = f"{name} Raw Data"
+        customers, months, cell = load_long_csv(seg["long_csv"])
+        actuals_through = seg.get("actuals_through")
+        if actuals_through:
+            cutoff = parse_month_cutoff(actuals_through)
+            months = [m for m in months if m <= cutoff]
+
+        ws_cork = wb.create_sheet(cork_name)
+        ws_raw = wb.create_sheet(raw_name)
+
+        source_path = seg.get("source")
+        if source_path and not str(source_path).lower().endswith(".csv"):
+            source_sheet = seg["source_sheet"]
+            _src_wb = load_workbook(source_path, data_only=True)
+            src_ws = _src_wb[source_sheet]
+            _src_wb_f = load_workbook(source_path, data_only=False)
+            src_ws_formulas = _src_wb_f[source_sheet]
+            # Carry the FIRST segment's theme (all Metazoa sheets share one theme).
+            if wb.loaded_theme is None and _src_wb_f.loaded_theme is not None:
+                wb.loaded_theme = _src_wb_f.loaded_theme
+            copy_source_sheet_verbatim(source_path, src_ws, ws_raw, src_ws_formulas)
+
+            first_date_col = seg.get("source_first_date_col", "B")
+            first_data_row = seg.get("source_first_data_row", 2)
+            last_data_row = seg.get("source_last_data_row") or find_source_last_data_row(
+                src_ws, seg.get("source_customer_col", "A"), first_data_row)
+            months_ts = get_source_months(
+                src_ws, first_date_col, header_row=seg.get("source_header_row")) or months
+            if actuals_through:
+                months_ts = [m for m in months_ts if m <= parse_month_cutoff(actuals_through)]
+            first_date_idx = column_index_from_string(first_date_col)
+            raw_geometry = {
+                "sheet": raw_name,
+                "first_row": first_data_row,
+                "last_row": last_data_row,
+                "first_date_col_idx": first_date_idx,
+            }
+            write_corkscrew_sheet_aggregating(
+                ws_cork, customers=customers, months_analysis=months_ts,
+                arr_factor=arr_factor, company=name,
+                in_scope_types=["Recurring"], analysis_sheet_name=raw_name,
+                lookback=lookback, raw_geometry=raw_geometry)
+            months_used = months_ts
+        else:
+            # CSV-only segment: Raw Data built from CSV (customers at rows 2..,
+            # months at col B..). Corkscrew references it directly.
+            write_raw_from_csv(ws_raw, customers, months, cell)
+            first_data_row = 2
+            last_data_row = 2 + len(customers) - 1
+            first_date_idx = 2  # col B
+            raw_geometry = {
+                "sheet": raw_name, "first_row": first_data_row,
+                "last_row": last_data_row, "first_date_col_idx": first_date_idx,
+            }
+            write_corkscrew_sheet_aggregating(
+                ws_cork, customers=customers, months_analysis=months,
+                arr_factor=arr_factor, company=name,
+                in_scope_types=["Recurring"], analysis_sheet_name=raw_name,
+                lookback=lookback, raw_geometry=raw_geometry)
+            months_used = months
+
+        n_periods = len(months_used) - lookback
+        period_counts.add(n_periods)
+        seg_specs.append({
+            "name": name, "corkscrew_sheet": cork_name, "raw_sheet": raw_name,
+            "first_row": first_data_row, "last_row": last_data_row,
+            "first_date_col_idx": first_date_idx, "lookback": lookback,
+            "months_periods": months_used[lookback:],
+            "months_prior": months_used[:n_periods],
+        })
+
+    if len(period_counts) != 1:
+        raise ValueError(
+            f"Segments produce differing comparison-period counts {period_counts}; "
+            "they must share the same month range for a column-aligned blend.")
+    n_periods = period_counts.pop()
+
+    ws_blended = wb.create_sheet("Blended Corkscrew", 0)  # leftmost
+    write_blended_corkscrew(
+        ws_blended, seg_specs, n_periods,
+        months_periods=seg_specs[0]["months_periods"],
+        months_prior=seg_specs[0]["months_prior"],
+        arr_factor=arr_factor, company=blended_company)
+
+    wb.remove(default_ws)
+    wb.save(output_xlsx_path)
+    return output_xlsx_path
+
+
+# ---------------------------------------------------------------------------
+# Self-test harness (Change #1/#2/#3 — TDD)
+# ---------------------------------------------------------------------------
+
+
+def _st_make_themed_source(path: str) -> None:
+    """Build a tiny one-row-per-customer source workbook that exercises:
+    - a LIVE date-header formula (=EOMONTH) and a computed customer-name formula,
+    - a header fill that references a THEME color (accent5) whose source palette
+      resolves to magenta #A02B93 (openpyxl's default theme would render teal).
+    Used by the verbatim self-tests."""
+    import zipfile
+    import shutil
+    # 1. Build the data + a theme-indexed fill with openpyxl.
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Seg"
+    from openpyxl.styles.colors import Color
+    themed = PatternFill("solid", fgColor=Color(theme=8, tint=0.0))  # accent5
+    # Header row 1: customer label + 15 month columns (live EOMONTH formulas).
+    ws["A1"] = "Customer ID"
+    ws["A1"].fill = themed
+    ws["B1"] = dt.datetime(2024, 1, 1)
+    ws["B1"].fill = themed
+    for j in range(1, 15):
+        col = get_column_letter(2 + j)
+        prev = get_column_letter(2 + j - 1)
+        c = ws[f"{col}1"]
+        c.value = f"=EOMONTH({prev}1,1)"   # LIVE formula
+        c.fill = themed
+    # 4 customers, one row each, flat revenue (clean contiguous block).
+    revs = [1000, 2000, 1500, 3000]
+    for i, rev in enumerate(revs):
+        r = 2 + i
+        ws[f"A{r}"] = f'="Customer " & (ROW()-1)'   # LIVE formula
+        for j in range(15):
+            ws.cell(row=r, column=2 + j, value=rev)
+    wb.save(path)
+    # 2. Rewrite theme1.xml so accent5 = magenta A02B93 (simulating a real
+    #    Office theme), AND inject cached <v> values for the formula cells so a
+    #    data_only=True load resolves them (exactly as a real Excel save would —
+    #    openpyxl can't recalc, so without a cache the discovery scans see None).
+    import re as _re
+    tmp = path + ".tmp"
+    with zipfile.ZipFile(path, "r") as zin:
+        names = zin.namelist()
+        theme = zin.read("xl/theme/theme1.xml").decode()
+        theme2 = _re.sub(r"<a:accent5>.*?</a:accent5>",
+                         '<a:accent5><a:srgbClr val="A02B93"/></a:accent5>',
+                         theme, flags=_re.S)
+        # Patch the sheet XML: add cached values to formula cells.
+        sheet_name = next(n for n in names if _re.match(r"xl/worksheets/sheet\d+\.xml$", n))
+        sheet = zin.read(sheet_name).decode()
+
+        def _cache_dates(m):
+            # <c r="C1" ...><f>=EOMONTH(B1,1)</f></c> -> add Excel serial date <v>
+            cell = m.group(0)
+            ref = _re.search(r'r="([A-Z]+)(\d+)"', cell)
+            col_letters, row = ref.group(1), int(ref.group(2))
+            col_idx = column_index_from_string(col_letters)
+            # month index 0-based from col B(=2)
+            mi = col_idx - 2
+            d = dt.date(2024, 1, 1)
+            # add mi months
+            y = 2024 + (mi // 12)
+            mo = 1 + (mi % 12)
+            d = dt.date(y, mo, 1)
+            serial = (d - dt.date(1899, 12, 30)).days
+            return cell.replace("</f>", f"</f><v>{serial}</v>")
+
+        # date header formulas in row 1 (=EOMONTH ...)
+        sheet = _re.sub(r'<c r="[A-Z]+1"[^>]*><f>=EOMONTH[^<]*</f></c>',
+                        _cache_dates, sheet)
+
+        # customer-name formulas in col A rows 2..5 → cache "Customer N"
+        def _cache_names(m):
+            cell = m.group(0)
+            ref = _re.search(r'r="A(\d+)"', cell)
+            n = int(ref.group(1)) - 1
+            # inline string cache: set t="str" and add <v>
+            cell = cell.replace("<c ", '<c t="str" ', 1) if 't="' not in cell else cell
+            return cell.replace("</f>", f"</f><v>Customer {n}</v>")
+        sheet = _re.sub(r'<c r="A[2-9]"[^>]*>(?:<f>[^<]*</f>)</c>', _cache_names, sheet)
+
+        with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
+            for n in names:
+                if n == "xl/theme/theme1.xml":
+                    zout.writestr(n, theme2)
+                elif n == sheet_name:
+                    zout.writestr(n, sheet)
+                else:
+                    zout.writestr(n, zin.read(n))
+    shutil.move(tmp, path)
+
+
+def _st_resolve_accent5(xlsx_path: str) -> str:
+    """Read the saved workbook's theme1.xml and return accent5's srgb hex."""
+    import zipfile
+    import re as _re
+    with zipfile.ZipFile(xlsx_path, "r") as z:
+        theme = z.read("xl/theme/theme1.xml").decode()
+    m = _re.search(r"<a:accent5>\s*<a:srgbClr val=\"([0-9A-Fa-f]{6})\"", theme)
+    return m.group(1).upper() if m else ""
+
+
+def _find_soffice() -> str | None:
+    """Locate a LibreOffice headless binary for recalc, if installed."""
+    import shutil
+    for cand in ("soffice", "libreoffice",
+                 "/Applications/LibreOffice.app/Contents/MacOS/soffice"):
+        p = shutil.which(cand) if "/" not in cand else (
+            cand if os.path.exists(cand) else None)
+        if p:
+            return p
+    return None
+
+
+def _st_recalc(xlsx_path: str, outdir: str) -> str | None:
+    """Recalculate a workbook with LibreOffice headless and return the path to
+    the recalced copy, or None if LibreOffice isn't available."""
+    import subprocess
+    soffice = _find_soffice()
+    if not soffice:
+        return None
+    sub = os.path.join(outdir, "recalc")
+    os.makedirs(sub, exist_ok=True)
+    try:
+        subprocess.run([soffice, "--headless", "--calc", "--convert-to", "xlsx",
+                        "--outdir", sub, xlsx_path],
+                       check=True, capture_output=True, timeout=120)
+    except Exception:
+        return None
+    out = os.path.join(sub, os.path.basename(xlsx_path))
+    return out if os.path.exists(out) else None
+
+
+def _self_test() -> int:
+    import tempfile
+    import os
+    import traceback
+    failures: List[str] = []
+
+    def check(name, cond, detail=""):
+        if cond:
+            print(f"  PASS — {name}")
+        else:
+            print(f"  FAIL — {name}: {detail}")
+            failures.append(name)
+
+    tmpd = tempfile.mkdtemp(prefix="deliver_selftest_")
+
+    # ---- Change #1: theme + formula verbatim ----------------------------
+    print("[#1] theme + formula verbatim")
+    try:
+        src = os.path.join(tmpd, "themed_src.xlsx")
+        _st_make_themed_source(src)
+        check("source theme accent5 is magenta", _st_resolve_accent5(src) == "A02B93",
+              _st_resolve_accent5(src))
+
+        # Build a long CSV from the source (4 customers x 15 months, flat).
+        # The fixture's month headers are live =EOMONTH formulas with no cached
+        # value (openpyxl can't recalc), so derive the month list from the known
+        # start (2024-01, monthly) rather than reading cached header values.
+        months_dt = [dt.date(2024, 1 + (j % 12) if j < 12 else (j - 12) + 1,
+                             1).replace(year=2024 + (j // 12)) for j in range(15)]
+        revs = [1000, 2000, 1500, 3000]
+        csv_path = os.path.join(tmpd, "seg.csv")
+        with open(csv_path, "w") as fh:
+            fh.write("customer_id,month,mrr\n")
+            for i in range(4):
+                cust = f"Customer {i + 1}"
+                for j, mdt in enumerate(months_dt):
+                    fh.write(f"{cust},{mdt.strftime('%Y-%m')},{revs[i]}\n")
+
+        out = os.path.join(tmpd, "verbatim_out.xlsx")
+        deliver(csv_path, out, arr_factor=12.0, company="ThemeTest",
+                source_path=src, source_sheet="Seg",
+                source_customer_col="A", source_first_data_row=2,
+                source_first_date_col="B", source_header_row=1,
+                source_last_data_row=5, lookback=12)
+
+        # 1a. Output carries the SOURCE theme (magenta), not openpyxl default.
+        check("output theme accent5 carried from source (magenta)",
+              _st_resolve_accent5(out) == "A02B93", _st_resolve_accent5(out))
+
+        # 1b. Raw Data preserves LIVE formulas (not flattened to values).
+        wb_f = load_workbook(out, data_only=False)
+        raw = wb_f["Raw Data"]
+        c1 = raw["C1"].value
+        check("Raw Data date header stays a live formula",
+              isinstance(c1, str) and c1.startswith("=EOMONTH"), repr(c1))
+        a2 = raw["A2"].value
+        check("Raw Data customer name stays a live formula",
+              isinstance(a2, str) and a2.startswith('="Customer'), repr(a2))
+
+        # 1c. Corkscrew explicit-RGB banner untouched by the theme carry.
+        cork = wb_f["Corkscrew"]
+        title_fill = cork.cell(row=ROW_TITLE, column=1).fill.fgColor
+        check("Corkscrew title banner still explicit RGB 1F4E79",
+              (title_fill.rgb or "").endswith(TITLE_FILL), repr(title_fill.rgb))
+    except Exception:
+        failures.append("#1 raised")
+        traceback.print_exc()
+
+    # ---- Change #2: two-sheet / no-helper path --------------------------
+    print("[#2] two-sheet / no-helper path")
+    try:
+        # Reuse the clean themed source from #1 (one contiguous row per
+        # customer, no aggregation needed). 15 months → lookback 12 → 3 periods.
+        src2 = os.path.join(tmpd, "themed_src.xlsx")
+        if not os.path.exists(src2):
+            _st_make_themed_source(src2)
+        csv2 = os.path.join(tmpd, "seg.csv")
+        if not os.path.exists(csv2):
+            months_dt = [dt.date(2024, 1, 1).replace(
+                year=2024 + (j // 12), month=1 + (j % 12)) for j in range(15)]
+            with open(csv2, "w") as fh:
+                fh.write("customer_id,month,mrr\n")
+                for i, rev in enumerate([1000, 2000, 1500, 3000]):
+                    for mdt in months_dt:
+                        fh.write(f"Customer {i + 1},{mdt.strftime('%Y-%m')},{rev}\n")
+
+        out2 = os.path.join(tmpd, "two_sheet_out.xlsx")
+        deliver(csv2, out2, arr_factor=12.0, company="TwoSheet",
+                source_path=src2, source_sheet="Seg",
+                source_customer_col="A", source_first_data_row=2,
+                source_first_date_col="B", source_header_row=1,
+                source_last_data_row=5, lookback=12, two_sheet=True)
+
+        wb2 = load_workbook(out2, data_only=False)
+        check("two-sheet output has exactly [Corkscrew, Raw Data]",
+              wb2.sheetnames == ["Corkscrew", "Raw Data"], wb2.sheetnames)
+        cork2 = wb2["Corkscrew"]
+        chk_formula = cork2.cell(row=ROW_CHECK, column=FIRST_DATA_COL).value
+        check("external check references 'Raw Data' directly",
+              isinstance(chk_formula, str) and "'Raw Data'!" in chk_formula,
+              repr(chk_formula))
+        beg_formula = cork2.cell(row=ROW_BEGIN, column=FIRST_DATA_COL).value
+        check("Beginning ARR references 'Raw Data' directly (no helper)",
+              isinstance(beg_formula, str) and "'Raw Data'!" in beg_formula
+              and "Analysis" not in beg_formula, repr(beg_formula))
+
+        # Gate: aggregating source + two_sheet must REFUSE (raise).
+        gate_ok = False
+        try:
+            deliver(csv2, os.path.join(tmpd, "gate.xlsx"), arr_factor=12.0,
+                    source_path=src2, source_sheet="Seg", source_type_col="Z",
+                    two_sheet=True)
+        except ValueError:
+            gate_ok = True
+        check("two_sheet refused when aggregating (type col present)", gate_ok)
+
+        # Recalc with LibreOffice (if available) → external check == 0 every period.
+        recalc = _st_recalc(out2, tmpd)
+        if recalc:
+            wbv = load_workbook(recalc, data_only=True)
+            corkv = wbv["Corkscrew"]
+            n_per = 3
+            checks = [corkv.cell(row=ROW_CHECK, column=FIRST_DATA_COL + j).value
+                      for j in range(n_per)]
+            allzero = all(abs(v or 0) < 1e-6 for v in checks)
+            check("recalc: external check == 0 every period (two-sheet)",
+                  allzero, str(checks))
+            # Ending for last period: flat revenue → ending == sum(rev)*12.
+            end_last = corkv.cell(row=ROW_END, column=FIRST_DATA_COL + n_per - 1).value
+            expected = (1000 + 2000 + 1500 + 3000) * 12
+            check("recalc: two-sheet Ending matches expected",
+                  abs((end_last or 0) - expected) < 1e-6,
+                  f"{end_last} vs {expected}")
+        else:
+            print("  SKIP — LibreOffice not available; recalc checks skipped")
+    except Exception:
+        failures.append("#2 raised")
+        traceback.print_exc()
+
+    # ---- Change #3: multi-segment + blended reconciliation --------------
+    print("[#3] multi-segment + blended corkscrew")
+    try:
+        # Two clean segments, each a one-row-per-customer themed source sheet.
+        months_dt = [dt.date(2024, 1, 1).replace(
+            year=2024 + (j // 12), month=1 + (j % 12)) for j in range(15)]
+
+        def _make_seg_source(path, revs):
+            wbx = Workbook(); wsx = wbx.active; wsx.title = "Seg"
+            wsx["A1"] = "Customer ID"
+            for j in range(15):
+                wsx.cell(row=1, column=2 + j, value=months_dt[j])
+            for i, rev in enumerate(revs):
+                wsx.cell(row=2 + i, column=1, value=f"Customer {i + 1}")
+                for j in range(15):
+                    wsx.cell(row=2 + i, column=2 + j, value=rev)
+            wbx.save(path)
+
+        def _make_seg_csv(path, revs):
+            with open(path, "w") as fh:
+                fh.write("customer_id,month,mrr\n")
+                for i, rev in enumerate(revs):
+                    for mdt in months_dt:
+                        fh.write(f"Customer {i + 1},{mdt.strftime('%Y-%m')},{rev}\n")
+
+        seg_a_src = os.path.join(tmpd, "seg_a.xlsx"); _make_seg_source(seg_a_src, [1000, 2000, 1500])
+        seg_b_src = os.path.join(tmpd, "seg_b.xlsx"); _make_seg_source(seg_b_src, [500, 800])
+        seg_a_csv = os.path.join(tmpd, "seg_a.csv"); _make_seg_csv(seg_a_csv, [1000, 2000, 1500])
+        seg_b_csv = os.path.join(tmpd, "seg_b.csv"); _make_seg_csv(seg_b_csv, [500, 800])
+
+        segments = [
+            {"name": "Core", "long_csv": seg_a_csv, "source": seg_a_src,
+             "source_sheet": "Seg", "source_customer_col": "A",
+             "source_first_data_row": 2, "source_last_data_row": 4,
+             "source_first_date_col": "B", "source_header_row": 1},
+            {"name": "PLG", "long_csv": seg_b_csv, "source": seg_b_src,
+             "source_sheet": "Seg", "source_customer_col": "A",
+             "source_first_data_row": 2, "source_last_data_row": 3,
+             "source_first_date_col": "B", "source_header_row": 1},
+        ]
+        out3 = os.path.join(tmpd, "blended_out.xlsx")
+        deliver_segments(segments, out3, arr_factor=12.0, company="Metazoa",
+                         lookback=12)
+
+        wb3 = load_workbook(out3, data_only=False)
+        names = wb3.sheetnames
+        check("per-segment corkscrews present",
+              "Core Corkscrew" in names and "PLG Corkscrew" in names, names)
+        check("blended corkscrew present", "Blended Corkscrew" in names, names)
+        check("per-segment Raw Data present",
+              "Core Raw Data" in names and "PLG Raw Data" in names, names)
+        blended = wb3["Blended Corkscrew"]
+        beg_f = blended.cell(row=ROW_BEGIN, column=FIRST_DATA_COL).value
+        check("blended Beginning sums segment corkscrews (cross-sheet refs)",
+              isinstance(beg_f, str) and "Corkscrew'!" in beg_f, repr(beg_f))
+
+        recalc = _st_recalc(out3, tmpd)
+        if recalc:
+            wbv = load_workbook(recalc, data_only=True)
+            bl = wbv["Blended Corkscrew"]
+            n_per = 3
+            variances = [bl.cell(row=ROW_CHECK, column=FIRST_DATA_COL + j).value
+                         for j in range(n_per)]
+            check("recalc: blended variance == 0 every period",
+                  all(abs(v or 0) < 1e-6 for v in variances), str(variances))
+            # Blended ending = sum of both segments' totals × 12.
+            end_last = bl.cell(row=ROW_END, column=FIRST_DATA_COL + n_per - 1).value
+            expected = (1000 + 2000 + 1500 + 500 + 800) * 12
+            check("recalc: blended Ending = sum of segment endings",
+                  abs((end_last or 0) - expected) < 1e-6,
+                  f"{end_last} vs {expected}")
+            # Cross-check each segment ending too.
+            core = wbv["Core Corkscrew"]
+            core_end = core.cell(row=ROW_END, column=FIRST_DATA_COL + n_per - 1).value
+            check("recalc: Core segment Ending correct",
+                  abs((core_end or 0) - (1000 + 2000 + 1500) * 12) < 1e-6,
+                  str(core_end))
+        else:
+            print("  SKIP — LibreOffice not available; blended recalc skipped")
+    except Exception:
+        failures.append("#3 raised")
+        traceback.print_exc()
+
+    print("=" * 60)
+    if failures:
+        print(f"SELF-TEST: FAIL ({len(failures)} failing): {failures}")
+        return 1
+    print("SELF-TEST: PASS")
+    return 0
+
+
+def _parse_segment_spec(spec: str) -> dict:
+    """Parse a --segment SPEC into a segment dict.
+    'Name=long.csv' or
+    'Name=long.csv:src.xlsx:Sheet:custCol:firstRow:lastRow:firstDateCol:headerRow'.
+    Trailing source params are optional (left to right)."""
+    if "=" not in spec:
+        raise ValueError(f"--segment {spec!r} missing 'Name='. Use 'Name=long.csv[:...]'.")
+    name, rest = spec.split("=", 1)
+    parts = rest.split(":")
+    seg = {"name": name.strip(), "long_csv": parts[0]}
+    keys = ["source", "source_sheet", "source_customer_col",
+            "source_first_data_row", "source_last_data_row",
+            "source_first_date_col", "source_header_row"]
+    for k, v in zip(keys, parts[1:]):
+        if v == "":
+            continue
+        if k in ("source_first_data_row", "source_last_data_row", "source_header_row"):
+            seg[k] = int(v)
+        else:
+            seg[k] = v
+    return seg
+
+
 def parse_args(argv):
     p = argparse.ArgumentParser(description="Retention-analysis Phase 5.")
-    p.add_argument("long_csv")
+    p.add_argument("long_csv", nargs="?", default=None,
+                   help="Long-format CSV (omit when using >= 2 --segment specs).")
     p.add_argument("output_xlsx")
     p.add_argument("--arr-factor", type=float, default=12.0,
                    help="MRR->ARR multiplier (12 for MRR input, 1 for ARR input)")
@@ -1289,6 +2085,32 @@ def parse_args(argv):
                    help="Comma-separated list of in-scope types "
                         "(default: 'Recurring,Re-occurring')")
     p.add_argument("--lookback", type=int, default=12)
+    p.add_argument("--two-sheet", action="store_true",
+                   help="Change #2: build a 2-sheet deliverable (Corkscrew + Raw "
+                        "Data, no helper). Opt-in; ONLY pass after survey.py "
+                        "confirms a clean contiguous one-row-per-customer block "
+                        "(customer_row_range.contiguous, no section rows inside) "
+                        "with a single in-scope revenue type. The Corkscrew then "
+                        "references Raw Data directly.")
+    p.add_argument("--segment", action="append", default=None, metavar="SPEC",
+                   help="Change #3: declare a segment for a multi-segment "
+                        "deliverable. Repeatable (one per segment). SPEC is "
+                        "'Name=long.csv' optionally followed by colon-separated "
+                        "source params: "
+                        "'Name=long.csv:src.xlsx:Sheet:custCol:firstRow:lastRow:firstDateCol:headerRow'. "
+                        "NOTE: colon-delimited specs break if a path/sheet name "
+                        "contains a ':' — prefer --segment-config (JSON) for "
+                        "anything non-trivial. With 2+ segments deliver_segments() "
+                        "runs; output_xlsx is the destination. Produces a Corkscrew "
+                        "+ Raw Data per segment plus a Blended Corkscrew (blended "
+                        "variance = 0 every period).")
+    p.add_argument("--segment-config", default=None, metavar="JSON",
+                   help="Change #3 (preferred): path to a JSON file holding a list "
+                        "of segment dicts (name, long_csv, source, source_sheet, "
+                        "source_customer_col, source_first_data_row, "
+                        "source_last_data_row, source_first_date_col, "
+                        "source_header_row, actuals_through). Unambiguous for paths "
+                        "and sheet names with spaces or colons. Overrides --segment.")
     # Apply survey.py --emit-config values as defaults; explicit CLI flags win.
     pre, _ = p.parse_known_args(argv)
     if pre.config:
@@ -1301,7 +2123,34 @@ def parse_args(argv):
 def main(argv=None):
     import time
     _t0 = time.perf_counter()
-    args = parse_args(argv if argv is not None else sys.argv[1:])
+    raw_argv = argv if argv is not None else sys.argv[1:]
+    if "--self-test" in raw_argv:
+        return _self_test()
+    args = parse_args(raw_argv)
+
+    # Change #3 — multi-segment route. JSON config wins over colon specs.
+    segments = None
+    if args.segment_config:
+        with open(args.segment_config, "r", encoding="utf-8") as fh:
+            segments = json.load(fh)
+    elif args.segment and len(args.segment) >= 2:
+        segments = [_parse_segment_spec(s) for s in args.segment]
+    if segments and len(segments) >= 2:
+        for seg in segments:
+            seg.setdefault("actuals_through", args.actuals_through)
+        out_xlsx = deliver_segments(
+            segments, args.output_xlsx, arr_factor=args.arr_factor,
+            company=args.company, lookback=args.lookback)
+        print(f"Wrote: {out_xlsx}")
+        print(f"[deliver.py] built {len(segments)}-segment workbook in "
+              f"{time.perf_counter() - _t0:.2f}s", file=sys.stderr)
+        return 0
+    if args.segment and len(args.segment) == 1:
+        raise SystemExit("--segment needs >= 2 specs for a blended workbook; "
+                         "use the single-source flags for one segment.")
+    if args.long_csv is None:
+        raise SystemExit("long_csv is required unless >= 2 --segment specs are given.")
+
     type_filter = (
         [t.strip() for t in args.type_filter.split(",")]
         if args.type_filter else None
@@ -1322,6 +2171,7 @@ def main(argv=None):
         source_header_row=args.source_header_row,
         source_last_data_row=args.source_last_data_row,
         actuals_through=args.actuals_through,
+        two_sheet=args.two_sheet,
     )
     print(f"Wrote: {out_xlsx}")
     print(f"[deliver.py] built workbook in {time.perf_counter() - _t0:.2f}s", file=sys.stderr)

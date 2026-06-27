@@ -46,6 +46,7 @@ The agent checks for relevant skills before any task.
 - **retention-analysis** — Gross/Net/Logo retention + ARR corkscrew from customer-level revenue
 - **arr-to-bookings** — Quarterly new-logo vs. upsell ACV bookings from customer-level MRR/ARR (estimate; not for usage-based models)
 - **pipeline-analysis** — Open-pipeline analysis (coverage, weighted pipeline, stage × product/type/owner, aging, concentration) from a deal-level export; adds conversion context when closed history is included
+- **customer-concentration-analysis** — Top-10 customer concentration (each customer's % of total, top-10 vs. remaining, ties out to the total) from customer-level revenue; values shown verbatim (never annualized), labeled ARR/MRR only when certain
 
 ## Principles
 

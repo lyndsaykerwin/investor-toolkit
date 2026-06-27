@@ -1,0 +1,121 @@
+Opportunity ID,Account Name,Booking ARR,Deal Stage,Close Date,Create Date,Deal Type,Lead Source,Product Family,Deal Owner,Known Competitors,Incumbent Vendor,Closed Reason
+OPP-1000,Example Customer 0,2000,Closed Won,2024-03-18,2024-01-01,New Logo,Sales,Analytics Add-on,Rep Three,,Home-grown,
+OPP-1001,Example Customer 1,90000,No Business Awarded,2024-04-19,2024-03-21,New Logo,Sales,Core Platform,Rep One,,Legacy Co,No budget
+OPP-1002,Example Customer 2,1000,Closed Won,2024-10-16,2024-08-26,Upsell,Renewal,Core Platform,Rep One,,Home-grown,
+OPP-1003,Example Customer 3,5000,Closed Lost,2024-03-09,2024-01-01,Renewal,Customer Success,Core Platform,Rep One,,,Price
+OPP-1004,Example Customer 4,1000,Closed Lost,2024-07-09,2024-05-26,New Logo,Renewal,Analytics Add-on,Rep Two,Competitor Y,,Not Qualified
+OPP-1005,Example Customer 5,5000,No Business Awarded,2024-07-04,2024-03-30,Upsell,Sales,Analytics Add-on,Rep Three,Competitor Y,Legacy Co,Not Qualified
+OPP-1006,Example Customer 6,2000,No Business Awarded,2024-05-27,2024-01-01,New Logo,Marketing,Analytics Add-on,Rep One,Competitor Y,Legacy Co,No budget
+OPP-1007,Example Customer 7,48000,Closed Won,2024-12-08,2024-10-30,Cross-Sell,Customer Success,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1008,Example Customer 8,2000,Closed Won,2024-02-17,2024-01-01,Renewal,Sales,Analytics Add-on,Rep Three,,,
+OPP-1009,Example Customer 9,48000,No Business Awarded,2024-08-16,2024-05-16,Renewal,Renewal,Analytics Add-on,Rep One,,Home-grown,Price
+OPP-1010,Example Customer 10,12000,Closed Won,2024-04-21,2024-01-19,Upsell,Renewal,Analytics Add-on,Rep Two,,Home-grown,
+OPP-1011,Example Customer 11,5000,Closed Won,2024-07-24,2024-02-15,Cross-Sell,Renewal,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1012,Example Customer 12,5000,No Business Awarded,2024-12-15,2024-08-20,Upsell,Marketing,Core Platform,Rep One,,Home-grown,Price
+OPP-1013,Example Customer 13,24000,Closed Won,2024-10-28,2024-08-23,Cross-Sell,Sales,Core Platform,Rep Two,,,
+OPP-1014,Example Customer 14,1000,Closed Won,2024-10-16,2024-07-07,Upsell,Renewal,Analytics Add-on,Rep Two,,Legacy Co,
+OPP-1015,Example Customer 15,12000,Closed Won,2024-09-03,2024-05-04,New Logo,Sales,Core Platform,Rep Two,,Home-grown,
+OPP-1016,Example Customer 16,1000,Closed Won,2024-11-03,2024-10-01,New Logo,Marketing,Core Platform,Rep Two,,,
+OPP-1017,Example Customer 17,5000,Closed Won,2024-04-16,2024-01-01,Renewal,Customer Success,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1018,Example Customer 18,150000,Closed Won,2024-02-29,2024-01-01,Renewal,Renewal,Analytics Add-on,Rep One,,Home-grown,
+OPP-1019,Example Customer 19,5000,Closed Won,2024-06-24,2024-03-29,Renewal,Sales,Core Platform,Rep Three,,Legacy Co,
+OPP-1020,Example Customer 20,2000,Closed Won,2024-10-05,2024-09-09,Cross-Sell,Customer Success,Analytics Add-on,Rep One,,Legacy Co,
+OPP-1021,Example Customer 21,12000,No Business Awarded,2024-09-29,2024-04-24,Cross-Sell,Marketing,Analytics Add-on,Rep Three,Competitor X,Home-grown,Not Qualified
+OPP-1022,Example Customer 22,24000,Closed Won,2024-07-01,2024-06-04,New Logo,Renewal,Analytics Add-on,Rep One,,,
+OPP-1023,Example Customer 23,48000,Closed Lost,2024-06-25,2024-02-12,Cross-Sell,Marketing,Core Platform,Rep One,Competitor Y,Home-grown,Price
+OPP-1024,Example Customer 24,150000,Closed Won,2024-09-04,2024-03-09,New Logo,Customer Success,Core Platform,Rep Three,,Home-grown,
+OPP-1025,Example Customer 25,5000,No Business Awarded,2025-02-04,2024-11-25,Renewal,Customer Success,Core Platform,Rep Three,Competitor Y,Legacy Co,No budget
+OPP-1026,Example Customer 26,5000,Closed Won,2024-02-13,2024-01-01,Upsell,Sales,Core Platform,Rep Three,,Legacy Co,
+OPP-1027,Example Customer 27,48000,No Business Awarded,2024-03-15,2024-01-01,Renewal,Marketing,Core Platform,Rep One,,,Not Qualified
+OPP-1028,Example Customer 28,12000,Closed Won,2025-01-18,2024-11-24,Renewal,Marketing,Core Platform,Rep Two,,Home-grown,
+OPP-1029,Example Customer 29,24000,Closed Won,2024-05-03,2024-01-01,Cross-Sell,Renewal,Core Platform,Rep One,,,
+OPP-1030,Example Customer 30,5000,Closed Won,2024-08-22,2024-03-06,Renewal,Marketing,Core Platform,Rep Two,,Home-grown,
+OPP-1031,Example Customer 31,5000,Closed Lost,2025-02-01,2024-12-05,Upsell,Sales,Core Platform,Rep Two,,,No budget
+OPP-1032,Example Customer 32,12000,Closed Won,2024-09-04,2024-07-19,New Logo,Marketing,Analytics Add-on,Rep One,,Home-grown,
+OPP-1033,Example Customer 33,150000,Closed Won,2024-10-14,2024-09-17,New Logo,Customer Success,Core Platform,Rep Three,,Legacy Co,
+OPP-1034,Example Customer 34,24000,Closed Won,2024-09-30,2024-05-11,Upsell,Marketing,Analytics Add-on,Rep One,,Legacy Co,
+OPP-1035,Example Customer 35,12000,Closed Won,2024-08-14,2024-05-06,New Logo,Renewal,Core Platform,Rep One,,,
+OPP-1036,Example Customer 36,5000,Closed Won,2024-03-03,2024-01-04,Cross-Sell,Customer Success,Core Platform,Rep Two,,Home-grown,
+OPP-1037,Example Customer 37,5000,No Business Awarded,2024-02-18,2024-01-01,Renewal,Marketing,Analytics Add-on,Rep Three,Competitor Y,Legacy Co,Not Qualified
+OPP-1038,Example Customer 38,48000,Closed Won,2024-07-01,2024-03-22,New Logo,Sales,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1039,Example Customer 39,24000,Closed Won,2024-01-10,2024-01-01,Cross-Sell,Sales,Core Platform,Rep One,,Home-grown,
+OPP-1040,Example Customer 0,24000,Closed Won,2024-05-19,2024-04-19,Upsell,Marketing,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1041,Example Customer 1,48000,Closed Won,2024-10-01,2024-05-03,Renewal,Sales,Analytics Add-on,Rep One,,,
+OPP-1042,Example Customer 2,2000,Closed Won,2024-02-07,2024-01-01,New Logo,Customer Success,Core Platform,Rep Three,,Home-grown,
+OPP-1043,Example Customer 3,48000,Closed Won,2024-03-03,2024-01-01,New Logo,Renewal,Analytics Add-on,Rep Three,,Home-grown,
+OPP-1044,Example Customer 4,5000,Closed Won,2024-12-29,2024-10-09,New Logo,Customer Success,Core Platform,Rep One,,Home-grown,
+OPP-1045,Example Customer 5,24000,No Business Awarded,2024-11-17,2024-08-11,Upsell,Marketing,Analytics Add-on,Rep Two,Competitor X,Legacy Co,No budget
+OPP-1046,Example Customer 6,150000,Closed Won,2024-01-10,2024-01-01,Upsell,Marketing,Analytics Add-on,Rep One,,,
+OPP-1047,Example Customer 7,24000,No Business Awarded,2024-08-09,2024-03-16,Renewal,Marketing,Analytics Add-on,Rep One,,,Not Qualified
+OPP-1048,Example Customer 8,5000,Closed Lost,2024-07-26,2024-04-09,New Logo,Sales,Analytics Add-on,Rep Two,Competitor X,Home-grown,Price
+OPP-1049,Example Customer 9,12000,Closed Won,2024-07-14,2024-02-16,Cross-Sell,Customer Success,Core Platform,Rep Two,,Home-grown,
+OPP-1050,Example Customer 10,48000,Closed Won,2024-08-16,2024-07-27,Cross-Sell,Customer Success,Analytics Add-on,Rep One,,Home-grown,
+OPP-1051,Example Customer 11,5000,No Business Awarded,2024-06-07,2024-03-24,Cross-Sell,Customer Success,Analytics Add-on,Rep One,Competitor Y,Legacy Co,Price
+OPP-1052,Example Customer 12,2000,Closed Won,2024-04-12,2024-01-20,New Logo,Customer Success,Core Platform,Rep One,,Legacy Co,
+OPP-1053,Example Customer 13,24000,Closed Lost,2024-07-20,2024-06-25,Cross-Sell,Sales,Core Platform,Rep Three,,,Not Qualified
+OPP-1054,Example Customer 14,24000,Closed Won,2024-06-15,2024-01-21,Upsell,Marketing,Core Platform,Rep Three,,,
+OPP-1055,Example Customer 15,1000,Closed Lost,2025-01-10,2024-08-14,Upsell,Sales,Core Platform,Rep One,Competitor X,,Not Qualified
+OPP-1056,Example Customer 16,1000,Closed Won,2024-02-23,2024-01-01,Renewal,Sales,Core Platform,Rep Two,,Legacy Co,
+OPP-1057,Example Customer 17,2000,Closed Won,2024-02-05,2024-01-01,New Logo,Renewal,Analytics Add-on,Rep One,,Legacy Co,
+OPP-1058,Example Customer 18,150000,Closed Won,2025-01-22,2024-11-11,Upsell,Renewal,Analytics Add-on,Rep One,,Legacy Co,
+OPP-1059,Example Customer 19,2000,No Business Awarded,2024-05-27,2024-04-26,Upsell,Customer Success,Analytics Add-on,Rep Three,,,Not Qualified
+OPP-1060,Example Customer 20,150000,Closed Won,2024-10-17,2024-08-24,New Logo,Sales,Analytics Add-on,Rep Two,,,
+OPP-1061,Example Customer 21,24000,Closed Won,2024-04-21,2024-01-01,Cross-Sell,Renewal,Analytics Add-on,Rep Two,,Home-grown,
+OPP-1062,Example Customer 22,2000,No Business Awarded,2024-10-08,2024-07-29,Cross-Sell,Sales,Analytics Add-on,Rep Two,Competitor X,,No budget
+OPP-1063,Example Customer 23,12000,No Business Awarded,2024-08-18,2024-05-22,Renewal,Sales,Core Platform,Rep One,,,Not Qualified
+OPP-1064,Example Customer 24,2000,Closed Won,2024-07-03,2024-05-11,Cross-Sell,Customer Success,Core Platform,Rep Two,,Legacy Co,
+OPP-1065,Example Customer 25,150000,Closed Won,2024-03-22,2024-03-02,Renewal,Renewal,Analytics Add-on,Rep Three,,Home-grown,
+OPP-1066,Example Customer 26,48000,Closed Won,2024-07-11,2024-04-02,New Logo,Sales,Analytics Add-on,Rep Two,,Legacy Co,
+OPP-1067,Example Customer 27,24000,Closed Won,2024-04-10,2024-03-18,Cross-Sell,Customer Success,Core Platform,Rep Two,,Legacy Co,
+OPP-1068,Example Customer 28,90000,No Business Awarded,2024-10-28,2024-09-19,Cross-Sell,Sales,Analytics Add-on,Rep One,Competitor X,,Other
+OPP-1069,Example Customer 29,90000,Closed Won,2024-03-17,2024-01-01,Cross-Sell,Customer Success,Core Platform,Rep Two,,Legacy Co,
+OPP-1070,Example Customer 30,2000,No Business Awarded,2025-01-24,2024-09-24,Upsell,Renewal,Analytics Add-on,Rep Three,Competitor X,,Price
+OPP-1071,Example Customer 31,5000,No Business Awarded,2024-09-05,2024-08-04,Upsell,Renewal,Analytics Add-on,Rep Two,Competitor Y,Legacy Co,No budget
+OPP-1072,Example Customer 32,12000,No Business Awarded,2024-11-30,2024-09-05,Renewal,Renewal,Analytics Add-on,Rep One,Competitor X,,Other
+OPP-1073,Example Customer 33,12000,Closed Won,2024-04-16,2024-01-01,Renewal,Renewal,Analytics Add-on,Rep Two,,Legacy Co,
+OPP-1074,Example Customer 34,5000,Closed Won,2024-04-08,2024-01-17,New Logo,Customer Success,Core Platform,Rep Two,,Home-grown,
+OPP-1075,Example Customer 35,90000,Closed Won,2024-10-18,2024-08-08,New Logo,Renewal,Analytics Add-on,Rep Three,,,
+OPP-1076,Example Customer 36,150000,Closed Won,2024-05-18,2024-02-02,New Logo,Customer Success,Analytics Add-on,Rep One,,,
+OPP-1077,Example Customer 37,24000,Closed Won,2024-11-18,2024-09-04,New Logo,Marketing,Analytics Add-on,Rep Two,,,
+OPP-1078,Example Customer 38,1000,Closed Won,2024-06-08,2024-05-14,Upsell,Renewal,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1079,Example Customer 39,150000,Closed Won,2024-07-19,2024-02-15,Renewal,Marketing,Core Platform,Rep One,,Home-grown,
+OPP-1080,Example Customer 0,2000,Closed Won,2024-12-15,2024-10-29,Renewal,Sales,Core Platform,Rep One,,Home-grown,
+OPP-1081,Example Customer 1,24000,Closed Lost,2024-01-20,2024-01-01,Upsell,Sales,Core Platform,Rep One,Competitor Y,,No budget
+OPP-1082,Example Customer 2,12000,No Business Awarded,2024-04-08,2024-01-01,Cross-Sell,Sales,Analytics Add-on,Rep Two,Competitor Y,Legacy Co,Price
+OPP-1083,Example Customer 3,12000,Closed Lost,2024-05-04,2024-01-01,Upsell,Renewal,Analytics Add-on,Rep One,Competitor X,Home-grown,Price
+OPP-1084,Example Customer 4,24000,Closed Won,2024-12-11,2024-08-06,New Logo,Marketing,Analytics Add-on,Rep Two,,Home-grown,
+OPP-1085,Example Customer 5,48000,Closed Won,2024-12-22,2024-09-07,Renewal,Renewal,Core Platform,Rep One,,Legacy Co,
+OPP-1086,Example Customer 6,150000,No Business Awarded,2024-09-15,2024-08-09,Upsell,Customer Success,Core Platform,Rep One,Competitor Y,Home-grown,Not Qualified
+OPP-1087,Example Customer 7,5000,Closed Won,2024-05-31,2024-04-14,Renewal,Marketing,Analytics Add-on,Rep Two,,,
+OPP-1088,Example Customer 8,1000,Closed Won,2024-10-31,2024-09-04,Renewal,Marketing,Core Platform,Rep Three,,Home-grown,
+OPP-1089,Example Customer 9,90000,Closed Won,2024-12-29,2024-11-24,Upsell,Renewal,Analytics Add-on,Rep Three,,Home-grown,
+OPP-1090,Example Customer 10,5000,No Business Awarded,2024-03-25,2024-01-01,Upsell,Sales,Analytics Add-on,Rep Three,,Legacy Co,No budget
+OPP-1091,Example Customer 11,2000,No Business Awarded,2024-06-18,2024-02-06,Upsell,Sales,Analytics Add-on,Rep One,Competitor Y,Legacy Co,Price
+OPP-1092,Example Customer 12,90000,No Business Awarded,2024-03-04,2024-01-01,Upsell,Customer Success,Analytics Add-on,Rep One,Competitor X,,Other
+OPP-1093,Example Customer 13,12000,Closed Won,2024-07-09,2024-02-02,Renewal,Customer Success,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1094,Example Customer 14,1000,Closed Won,2024-07-29,2024-05-07,Renewal,Renewal,Core Platform,Rep Two,,Home-grown,
+OPP-1095,Example Customer 15,2000,No Business Awarded,2024-02-01,2024-01-01,Upsell,Customer Success,Analytics Add-on,Rep Two,,Home-grown,Other
+OPP-1096,Example Customer 16,24000,Closed Won,2025-01-01,2024-09-22,Cross-Sell,Sales,Core Platform,Rep One,,Home-grown,
+OPP-1097,Example Customer 17,24000,Closed Won,2025-01-01,2024-08-15,Renewal,Renewal,Analytics Add-on,Rep One,,Legacy Co,
+OPP-1098,Example Customer 18,12000,Closed Won,2025-01-13,2024-10-08,Upsell,Customer Success,Analytics Add-on,Rep Two,,Legacy Co,
+OPP-1099,Example Customer 19,90000,No Business Awarded,2024-11-01,2024-09-22,Upsell,Marketing,Analytics Add-on,Rep One,,Home-grown,Not Qualified
+OPP-1100,Example Customer 20,90000,Closed Won,2024-10-05,2024-06-24,Upsell,Sales,Core Platform,Rep Two,,,
+OPP-1101,Example Customer 21,150000,Closed Won,2024-02-19,2024-01-01,Renewal,Marketing,Core Platform,Rep One,,Legacy Co,
+OPP-1102,Example Customer 22,24000,Closed Won,2024-12-11,2024-09-22,New Logo,Customer Success,Analytics Add-on,Rep Three,,Legacy Co,
+OPP-1103,Example Customer 23,150000,Closed Won,2025-01-12,2024-10-18,Upsell,Marketing,Core Platform,Rep One,,Home-grown,
+OPP-1104,Example Customer 24,2000,Closed Won,2024-10-23,2024-08-16,Cross-Sell,Renewal,Analytics Add-on,Rep One,,,
+OPP-1105,Example Customer 25,1000,Closed Won,2024-11-28,2024-10-14,Renewal,Sales,Core Platform,Rep Two,,Home-grown,
+OPP-1106,Example Customer 26,12000,No Business Awarded,2024-07-10,2024-06-10,Cross-Sell,Sales,Core Platform,Rep Three,,Home-grown,Price
+OPP-1107,Example Customer 27,150000,No Business Awarded,2024-07-09,2024-02-09,Upsell,Sales,Core Platform,Rep Three,,,Other
+OPP-1108,Example Customer 28,48000,Closed Lost,2024-04-21,2024-03-23,Cross-Sell,Sales,Core Platform,Rep Two,Competitor X,,Not Qualified
+OPP-1109,Example Customer 29,90000,No Business Awarded,2024-04-14,2024-03-23,Cross-Sell,Marketing,Analytics Add-on,Rep One,Competitor X,Home-grown,Other
+OPP-1110,Example Customer 30,90000,No Business Awarded,2024-10-07,2024-05-17,New Logo,Renewal,Core Platform,Rep Three,,Home-grown,Price
+OPP-1111,Example Customer 31,24000,Closed Lost,2024-07-22,2024-04-24,Renewal,Renewal,Core Platform,Rep Two,,,Other
+OPP-1112,Example Customer 32,48000,No Business Awarded,2024-07-31,2024-03-27,New Logo,Renewal,Analytics Add-on,Rep One,Competitor X,Legacy Co,Not Qualified
+OPP-1113,Example Customer 33,90000,No Business Awarded,2024-08-04,2024-06-16,New Logo,Renewal,Core Platform,Rep One,Competitor X,Home-grown,Other
+OPP-1114,Example Customer 34,48000,Closed Lost,2024-11-24,2024-07-26,New Logo,Marketing,Analytics Add-on,Rep Two,Competitor X,,Not Qualified
+OPP-1115,Example Customer 35,150000,Closed Won,2024-02-04,2024-01-01,Renewal,Marketing,Analytics Add-on,Rep One,,Home-grown,
+OPP-1116,Example Customer 36,90000,No Business Awarded,2024-09-04,2024-05-27,New Logo,Marketing,Core Platform,Rep Three,Competitor Y,,Price
+OPP-1117,Example Customer 37,1000,No Business Awarded,2024-08-30,2024-06-25,Upsell,Marketing,Analytics Add-on,Rep Two,Competitor X,Home-grown,No budget
+OPP-1118,Example Customer 38,1000,Closed Won,2025-01-06,2024-10-29,New Logo,Customer Success,Core Platform,Rep Two,,,
+OPP-1119,Example Customer 39,24000,Closed Won,2024-11-17,2024-08-11,Renewal,Marketing,Analytics Add-on,Rep Two,,,

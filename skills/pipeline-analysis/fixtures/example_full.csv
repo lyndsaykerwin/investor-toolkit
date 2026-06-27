@@ -1,0 +1,121 @@
+Opportunity ID,Account Name,Booking ARR,Stage,Probability,Close Date,Create Date,Deal Type,Product Family,Deal Owner
+OPP-1000,Customer 0,60000,Negotiation,0.75,2026-08-18,2026-05-23,Cross-Sell,Core Platform,Rep One
+OPP-1001,Customer 1,5000,Negotiation,0.75,2025-07-31,2025-05-05,Upsell,Core Platform,Rep One
+OPP-1002,Customer 2,60000,Discovery,0.1,2026-03-29,2025-12-06,Cross-Sell,Core Platform,Rep Three
+OPP-1003,Customer 3,5000,Discovery,0.1,2026-05-28,2026-04-21,New Logo,Core Platform,Rep One
+OPP-1004,Customer 4,30000,Discovery,0.1,2026-05-11,2026-02-14,Cross-Sell,Core Platform,Rep Three
+OPP-1005,Customer 5,60000,Demo,0.25,2025-09-23,2025-08-24,Cross-Sell,Core Platform,Rep Two
+OPP-1006,Customer 6,120000,Proposal,0.5,2026-01-26,2025-12-17,Cross-Sell,Analytics Add-on,Rep Two
+OPP-1007,Customer 7,30000,Demo,0.25,2026-05-08,2026-04-05,New Logo,Core Platform,Rep Two
+OPP-1008,Customer 8,60000,Discovery,0.1,2025-09-27,2025-08-20,New Logo,Core Platform,Rep One
+OPP-1009,Customer 9,60000,Demo,0.25,2025-03-07,2024-12-19,Cross-Sell,Analytics Add-on,Rep Two
+OPP-1010,Customer 10,250000,Discovery,0.1,2026-07-23,2026-05-29,Cross-Sell,Analytics Add-on,Rep Two
+OPP-1011,Customer 11,30000,Discovery,0.1,2025-10-11,2025-09-10,Upsell,Core Platform,Rep One
+OPP-1012,Customer 12,5000,Demo,0.25,2025-03-16,2025-02-07,Upsell,Analytics Add-on,Rep One
+OPP-1013,Customer 13,120000,Demo,0.25,2026-03-23,2026-01-28,Cross-Sell,Core Platform,Rep Two
+OPP-1014,Customer 14,60000,Negotiation,0.75,2025-05-17,2025-02-23,New Logo,Core Platform,Rep Two
+OPP-1015,Customer 15,15000,Proposal,0.5,2025-01-08,2024-11-16,Upsell,Core Platform,Rep One
+OPP-1016,Customer 16,60000,Demo,0.25,2025-08-04,2025-06-02,New Logo,Analytics Add-on,Rep Two
+OPP-1017,Customer 17,5000,Negotiation,0.75,2025-02-20,2025-01-10,New Logo,Core Platform,Rep One
+OPP-1018,Customer 18,120000,Proposal,0.5,2026-02-07,2025-11-11,New Logo,Analytics Add-on,Rep Three
+OPP-1019,Customer 19,15000,Demo,0.25,2026-03-16,2025-11-26,New Logo,Analytics Add-on,Rep One
+OPP-1020,Customer 20,15000,Demo,0.25,2025-08-27,2025-05-09,Cross-Sell,Core Platform,Rep Three
+OPP-1021,Customer 21,120000,Negotiation,0.75,2026-04-14,2026-03-05,Upsell,Core Platform,Rep One
+OPP-1022,Customer 22,120000,Discovery,0.1,2025-02-05,2024-12-05,New Logo,Analytics Add-on,Rep Two
+OPP-1023,Customer 23,30000,Negotiation,0.75,2026-06-17,2026-03-13,New Logo,Core Platform,Rep One
+OPP-1024,Customer 24,120000,Demo,0.25,2026-06-22,2026-03-01,Cross-Sell,Core Platform,Rep Two
+OPP-1025,Customer 0,250000,Demo,0.25,2025-06-24,2025-05-23,New Logo,Analytics Add-on,Rep Two
+OPP-1026,Customer 1,5000,Negotiation,0.75,2025-08-13,2025-07-09,New Logo,Analytics Add-on,Rep Two
+OPP-1027,Customer 2,30000,Demo,0.25,2025-03-17,2025-01-29,Upsell,Analytics Add-on,Rep Three
+OPP-1028,Customer 3,5000,Demo,0.25,2025-03-01,2024-12-01,Upsell,Analytics Add-on,Rep One
+OPP-1029,Customer 4,60000,Discovery,0.1,2025-02-18,2025-01-11,Cross-Sell,Analytics Add-on,Rep Two
+OPP-1030,Customer 5,5000,Demo,0.25,2025-04-06,2025-01-09,Cross-Sell,Analytics Add-on,Rep Three
+OPP-1031,Customer 6,30000,Discovery,0.1,2025-05-22,2025-03-08,New Logo,Analytics Add-on,Rep One
+OPP-1032,Customer 7,60000,Negotiation,0.75,2025-03-09,2024-11-26,New Logo,Analytics Add-on,Rep Two
+OPP-1033,Customer 8,5000,Discovery,0.1,2025-02-18,2025-01-08,Cross-Sell,Core Platform,Rep Two
+OPP-1034,Customer 9,60000,Negotiation,0.75,2026-01-26,2025-09-30,Cross-Sell,Analytics Add-on,Rep Two
+OPP-1035,Customer 10,5000,Negotiation,0.75,2026-08-08,2026-05-04,Cross-Sell,Core Platform,Rep Two
+OPP-1036,Customer 11,5000,Discovery,0.1,2026-05-01,2026-03-03,Cross-Sell,Core Platform,Rep Two
+OPP-1037,Customer 12,5000,Negotiation,0.75,2025-09-30,2025-07-15,Upsell,Core Platform,Rep Three
+OPP-1038,Customer 13,15000,Demo,0.25,2026-06-22,2026-04-10,Cross-Sell,Analytics Add-on,Rep Two
+OPP-1039,Customer 14,60000,Demo,0.25,2026-01-19,2025-09-26,Upsell,Core Platform,Rep Three
+OPP-2000,Customer 0,8000,Closed Lost,0.0,2025-02-15,2024-12-06,Upsell,Core Platform,Rep Three
+OPP-2001,Customer 1,8000,Closed Lost,0.0,2024-04-17,2024-02-23,Upsell,Analytics Add-on,Rep One
+OPP-2002,Customer 2,8000,No Business Awarded,0.0,2024-02-02,2024-01-01,New Logo,Analytics Add-on,Rep Two
+OPP-2003,Customer 3,48000,Closed Lost,0.0,2025-04-18,2025-02-03,Upsell,Analytics Add-on,Rep Three
+OPP-2004,Customer 4,20000,Closed Lost,0.0,2025-01-01,2024-08-19,New Logo,Core Platform,Rep Two
+OPP-2005,Customer 5,90000,No Business Awarded,0.0,2024-01-22,2024-01-01,Upsell,Analytics Add-on,Rep Three
+OPP-2006,Customer 6,48000,No Business Awarded,0.0,2024-01-10,2024-01-01,Upsell,Core Platform,Rep One
+OPP-2007,Customer 7,2000,Closed Lost,0.0,2024-05-01,2024-03-06,Cross-Sell,Core Platform,Rep Two
+OPP-2008,Customer 8,150000,Closed Won,1.0,2024-11-18,2024-06-14,Cross-Sell,Analytics Add-on,Rep One
+OPP-2009,Customer 9,48000,No Business Awarded,0.0,2024-04-11,2024-01-31,Upsell,Core Platform,Rep Three
+OPP-2010,Customer 10,90000,Closed Won,1.0,2025-01-21,2024-09-03,Cross-Sell,Core Platform,Rep One
+OPP-2011,Customer 11,90000,Closed Won,1.0,2024-05-19,2024-02-01,Cross-Sell,Core Platform,Rep Two
+OPP-2012,Customer 12,2000,No Business Awarded,0.0,2025-04-08,2025-01-21,Upsell,Analytics Add-on,Rep One
+OPP-2013,Customer 13,150000,Closed Lost,0.0,2024-08-20,2024-06-11,New Logo,Analytics Add-on,Rep Three
+OPP-2014,Customer 14,20000,No Business Awarded,0.0,2024-11-30,2024-07-05,Upsell,Analytics Add-on,Rep Three
+OPP-2015,Customer 15,8000,Closed Won,1.0,2024-02-20,2024-01-01,New Logo,Analytics Add-on,Rep One
+OPP-2016,Customer 16,20000,Closed Lost,0.0,2024-10-01,2024-06-21,Cross-Sell,Core Platform,Rep Two
+OPP-2017,Customer 17,48000,No Business Awarded,0.0,2024-02-12,2024-01-14,Upsell,Analytics Add-on,Rep Two
+OPP-2018,Customer 18,8000,Closed Lost,0.0,2025-04-15,2025-03-19,New Logo,Analytics Add-on,Rep One
+OPP-2019,Customer 19,150000,Closed Won,1.0,2024-09-29,2024-06-16,New Logo,Analytics Add-on,Rep One
+OPP-2020,Customer 20,150000,No Business Awarded,0.0,2025-04-06,2024-11-05,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2021,Customer 21,8000,No Business Awarded,0.0,2025-04-30,2025-03-19,Upsell,Analytics Add-on,Rep Three
+OPP-2022,Customer 22,90000,No Business Awarded,0.0,2024-11-23,2024-09-22,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2023,Customer 23,20000,No Business Awarded,0.0,2024-07-14,2024-05-02,New Logo,Analytics Add-on,Rep Three
+OPP-2024,Customer 24,90000,Closed Lost,0.0,2024-04-12,2024-01-01,New Logo,Core Platform,Rep Three
+OPP-2025,Customer 25,2000,Closed Lost,0.0,2024-01-15,2024-01-01,Cross-Sell,Analytics Add-on,Rep Three
+OPP-2026,Customer 26,2000,No Business Awarded,0.0,2024-03-03,2024-01-01,Cross-Sell,Core Platform,Rep One
+OPP-2027,Customer 27,48000,No Business Awarded,0.0,2024-08-22,2024-04-19,Upsell,Core Platform,Rep Two
+OPP-2028,Customer 28,48000,Closed Lost,0.0,2024-03-06,2024-01-01,Upsell,Analytics Add-on,Rep One
+OPP-2029,Customer 29,20000,Closed Won,1.0,2024-08-02,2024-07-06,New Logo,Core Platform,Rep One
+OPP-2030,Customer 0,2000,Closed Won,1.0,2024-03-20,2024-01-02,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2031,Customer 1,90000,No Business Awarded,0.0,2024-06-30,2024-04-09,Upsell,Core Platform,Rep Two
+OPP-2032,Customer 2,90000,No Business Awarded,0.0,2024-10-25,2024-09-04,Cross-Sell,Analytics Add-on,Rep Three
+OPP-2033,Customer 3,48000,Closed Won,1.0,2024-12-25,2024-07-23,New Logo,Analytics Add-on,Rep Three
+OPP-2034,Customer 4,90000,Closed Lost,0.0,2025-02-26,2024-09-24,New Logo,Core Platform,Rep Three
+OPP-2035,Customer 5,90000,No Business Awarded,0.0,2024-11-22,2024-09-08,New Logo,Core Platform,Rep One
+OPP-2036,Customer 6,8000,No Business Awarded,0.0,2024-11-17,2024-08-01,Upsell,Analytics Add-on,Rep One
+OPP-2037,Customer 7,2000,Closed Won,1.0,2025-02-02,2024-11-25,New Logo,Core Platform,Rep One
+OPP-2038,Customer 8,48000,No Business Awarded,0.0,2024-02-15,2024-01-01,New Logo,Analytics Add-on,Rep Two
+OPP-2039,Customer 9,8000,No Business Awarded,0.0,2025-02-08,2024-12-18,Upsell,Core Platform,Rep One
+OPP-2040,Customer 10,20000,Closed Won,1.0,2024-10-18,2024-06-29,New Logo,Analytics Add-on,Rep Three
+OPP-2041,Customer 11,2000,No Business Awarded,0.0,2025-03-02,2024-12-24,Upsell,Core Platform,Rep One
+OPP-2042,Customer 12,90000,Closed Won,1.0,2025-01-25,2024-08-27,Upsell,Core Platform,Rep One
+OPP-2043,Customer 13,8000,Closed Won,1.0,2024-02-28,2024-01-01,New Logo,Analytics Add-on,Rep Three
+OPP-2044,Customer 14,8000,Closed Won,1.0,2024-10-23,2024-09-18,Cross-Sell,Analytics Add-on,Rep One
+OPP-2045,Customer 15,48000,Closed Won,1.0,2024-06-16,2024-02-17,Upsell,Analytics Add-on,Rep Two
+OPP-2046,Customer 16,2000,Closed Won,1.0,2024-11-03,2024-07-11,Cross-Sell,Core Platform,Rep One
+OPP-2047,Customer 17,20000,Closed Won,1.0,2024-07-27,2024-03-13,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2048,Customer 18,2000,Closed Won,1.0,2024-11-05,2024-09-04,Cross-Sell,Core Platform,Rep Two
+OPP-2049,Customer 19,90000,Closed Won,1.0,2025-02-14,2024-10-14,Cross-Sell,Core Platform,Rep Three
+OPP-2050,Customer 20,20000,No Business Awarded,0.0,2024-06-23,2024-03-29,New Logo,Core Platform,Rep Two
+OPP-2051,Customer 21,90000,Closed Won,1.0,2025-04-04,2024-12-21,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2052,Customer 22,150000,Closed Won,1.0,2024-07-26,2024-05-15,New Logo,Core Platform,Rep Two
+OPP-2053,Customer 23,2000,Closed Lost,0.0,2024-08-28,2024-07-14,Upsell,Core Platform,Rep One
+OPP-2054,Customer 24,20000,Closed Lost,0.0,2025-04-28,2025-01-22,New Logo,Analytics Add-on,Rep Three
+OPP-2055,Customer 25,48000,Closed Won,1.0,2024-09-29,2024-08-21,Cross-Sell,Analytics Add-on,Rep Three
+OPP-2056,Customer 26,48000,Closed Won,1.0,2024-12-25,2024-11-05,Cross-Sell,Core Platform,Rep One
+OPP-2057,Customer 27,20000,No Business Awarded,0.0,2024-02-25,2024-01-01,Upsell,Analytics Add-on,Rep Three
+OPP-2058,Customer 28,150000,Closed Won,1.0,2025-01-24,2024-11-15,Upsell,Core Platform,Rep One
+OPP-2059,Customer 29,20000,Closed Lost,0.0,2024-05-08,2024-02-08,Cross-Sell,Analytics Add-on,Rep Three
+OPP-2060,Customer 0,150000,No Business Awarded,0.0,2025-03-09,2025-01-23,Upsell,Core Platform,Rep Three
+OPP-2061,Customer 1,48000,No Business Awarded,0.0,2024-12-08,2024-11-07,New Logo,Analytics Add-on,Rep Two
+OPP-2062,Customer 2,90000,Closed Won,1.0,2025-03-14,2024-10-19,Cross-Sell,Core Platform,Rep Two
+OPP-2063,Customer 3,90000,Closed Lost,0.0,2024-08-03,2024-05-03,Upsell,Analytics Add-on,Rep Two
+OPP-2064,Customer 4,150000,No Business Awarded,0.0,2024-05-26,2024-01-04,Upsell,Analytics Add-on,Rep Three
+OPP-2065,Customer 5,2000,No Business Awarded,0.0,2025-01-17,2024-10-14,New Logo,Core Platform,Rep Three
+OPP-2066,Customer 6,48000,Closed Won,1.0,2024-11-20,2024-09-21,Cross-Sell,Analytics Add-on,Rep One
+OPP-2067,Customer 7,2000,Closed Lost,0.0,2025-01-18,2024-09-19,Cross-Sell,Analytics Add-on,Rep One
+OPP-2068,Customer 8,20000,Closed Won,1.0,2024-08-07,2024-03-18,New Logo,Core Platform,Rep Three
+OPP-2069,Customer 9,8000,Closed Won,1.0,2025-04-24,2024-12-06,New Logo,Core Platform,Rep One
+OPP-2070,Customer 10,2000,No Business Awarded,0.0,2024-08-01,2024-03-18,New Logo,Core Platform,Rep Two
+OPP-2071,Customer 11,20000,No Business Awarded,0.0,2024-03-20,2024-01-29,Upsell,Core Platform,Rep Three
+OPP-2072,Customer 12,150000,Closed Lost,0.0,2024-08-21,2024-05-26,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2073,Customer 13,20000,No Business Awarded,0.0,2024-09-28,2024-08-04,Cross-Sell,Core Platform,Rep One
+OPP-2074,Customer 14,20000,Closed Lost,0.0,2024-02-28,2024-01-01,Cross-Sell,Analytics Add-on,Rep Two
+OPP-2075,Customer 15,150000,Closed Lost,0.0,2024-11-08,2024-09-01,Upsell,Core Platform,Rep One
+OPP-2076,Customer 16,150000,Closed Won,1.0,2024-09-14,2024-07-06,New Logo,Core Platform,Rep One
+OPP-2077,Customer 17,2000,Closed Lost,0.0,2024-05-12,2024-01-05,Cross-Sell,Core Platform,Rep One
+OPP-2078,Customer 18,2000,Closed Won,1.0,2024-10-04,2024-07-05,New Logo,Core Platform,Rep Three
+OPP-2079,Customer 19,48000,Closed Won,1.0,2024-11-19,2024-07-27,Upsell,Analytics Add-on,Rep One

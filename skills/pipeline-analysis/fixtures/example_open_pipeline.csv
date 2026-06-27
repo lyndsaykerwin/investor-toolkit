@@ -1,0 +1,61 @@
+Opp ID,Customer,ACV,Stage,Expected Close,% Probability,Type,Source,Owner
+OPP-2000,Prospect 0,60000,Proposal,2025-04-29,0.5,Upsell,Marketing,Rep One
+OPP-2001,Prospect 1,120000,Discovery,2025-04-27,0.1,Upsell,Marketing,Rep Two
+OPP-2002,Prospect 2,15000,Negotiation,2025-06-07,0.75,Upsell,Renewal,Rep One
+OPP-2003,Prospect 3,15000,Discovery,2025-04-10,0.1,Upsell,Customer Success,Rep One
+OPP-2004,Prospect 4,120000,Negotiation,2025-04-30,0.75,New Logo,Sales,Rep Three
+OPP-2005,Prospect 5,5000,Demo,2025-06-22,0.25,Upsell,Sales,Rep One
+OPP-2006,Prospect 6,250000,Negotiation,2025-06-04,0.75,New Logo,Sales,Rep One
+OPP-2007,Prospect 7,15000,Discovery,2025-03-12,0.1,Upsell,Customer Success,Rep One
+OPP-2008,Prospect 8,5000,Demo,2025-06-10,0.25,Upsell,Customer Success,Rep One
+OPP-2009,Prospect 9,120000,Proposal,2025-03-31,0.5,Upsell,Marketing,Rep Two
+OPP-2010,Prospect 10,15000,Negotiation,2025-05-10,0.75,Upsell,Marketing,Rep Two
+OPP-2011,Prospect 11,5000,Proposal,2025-03-21,0.5,New Logo,Renewal,Rep One
+OPP-2012,Prospect 12,250000,Proposal,2025-04-06,0.5,Upsell,Marketing,Rep Two
+OPP-2013,Prospect 13,120000,Discovery,2025-03-02,0.1,Upsell,Renewal,Rep Three
+OPP-2014,Prospect 14,30000,Discovery,2025-05-03,0.1,Upsell,Customer Success,Rep Two
+OPP-2015,Prospect 15,30000,Negotiation,2025-05-08,0.75,New Logo,Customer Success,Rep Two
+OPP-2016,Prospect 16,60000,Discovery,2025-03-25,0.1,New Logo,Sales,Rep Two
+OPP-2017,Prospect 17,30000,Proposal,2025-05-16,0.5,Upsell,Sales,Rep Three
+OPP-2018,Prospect 18,15000,Discovery,2025-03-15,0.1,Upsell,Renewal,Rep Two
+OPP-2019,Prospect 19,5000,Proposal,2025-03-12,0.5,Upsell,Marketing,Rep Three
+OPP-2020,Prospect 20,5000,Discovery,2025-03-02,0.1,New Logo,Customer Success,Rep Two
+OPP-2021,Prospect 21,120000,Discovery,2025-04-10,0.1,New Logo,Renewal,Rep Three
+OPP-2022,Prospect 22,120000,Proposal,2025-03-13,0.5,New Logo,Customer Success,Rep Three
+OPP-2023,Prospect 23,15000,Negotiation,2025-03-13,0.75,New Logo,Marketing,Rep Three
+OPP-2024,Prospect 24,60000,Demo,2025-03-08,0.25,New Logo,Marketing,Rep Three
+OPP-2025,Prospect 25,60000,Proposal,2025-06-07,0.5,Upsell,Sales,Rep One
+OPP-2026,Prospect 26,120000,Proposal,2025-05-17,0.5,Upsell,Renewal,Rep One
+OPP-2027,Prospect 27,5000,Demo,2025-03-01,0.25,New Logo,Sales,Rep Two
+OPP-2028,Prospect 28,15000,Demo,2025-03-16,0.25,New Logo,Sales,Rep One
+OPP-2029,Prospect 29,15000,Demo,2025-04-17,0.25,New Logo,Renewal,Rep Three
+OPP-2030,Prospect 0,120000,Demo,2025-04-04,0.25,New Logo,Customer Success,Rep Three
+OPP-2031,Prospect 1,250000,Discovery,2025-06-04,0.1,Upsell,Sales,Rep Two
+OPP-2032,Prospect 2,250000,Negotiation,2025-06-20,0.75,Upsell,Sales,Rep Three
+OPP-2033,Prospect 3,15000,Negotiation,2025-03-24,0.75,New Logo,Customer Success,Rep One
+OPP-2034,Prospect 4,5000,Discovery,2025-04-07,0.1,Upsell,Sales,Rep Two
+OPP-2035,Prospect 5,250000,Negotiation,2025-06-04,0.75,Upsell,Customer Success,Rep Three
+OPP-2036,Prospect 6,5000,Demo,2025-06-16,0.25,New Logo,Marketing,Rep Two
+OPP-2037,Prospect 7,250000,Demo,2025-03-21,0.25,New Logo,Customer Success,Rep One
+OPP-2038,Prospect 8,30000,Negotiation,2025-05-11,0.75,New Logo,Renewal,Rep Three
+OPP-2039,Prospect 9,60000,Negotiation,2025-06-11,0.75,New Logo,Sales,Rep Two
+OPP-2040,Prospect 10,120000,Demo,2025-06-17,0.25,Upsell,Marketing,Rep Two
+OPP-2041,Prospect 11,120000,Discovery,2025-06-20,0.1,New Logo,Marketing,Rep One
+OPP-2042,Prospect 12,5000,Discovery,2025-03-09,0.1,New Logo,Customer Success,Rep One
+OPP-2043,Prospect 13,5000,Discovery,2025-03-01,0.1,New Logo,Sales,Rep Three
+OPP-2044,Prospect 14,250000,Discovery,2025-03-01,0.1,New Logo,Customer Success,Rep One
+OPP-2045,Prospect 15,250000,Discovery,2025-06-24,0.1,Upsell,Sales,Rep One
+OPP-2046,Prospect 16,15000,Demo,2025-03-10,0.25,New Logo,Sales,Rep Three
+OPP-2047,Prospect 17,250000,Discovery,2025-05-15,0.1,Upsell,Renewal,Rep One
+OPP-2048,Prospect 18,5000,Demo,2025-06-05,0.25,New Logo,Customer Success,Rep Two
+OPP-2049,Prospect 19,60000,Proposal,2025-03-29,0.5,New Logo,Customer Success,Rep Two
+OPP-2050,Prospect 20,5000,Proposal,2025-05-26,0.5,Upsell,Customer Success,Rep Three
+OPP-2051,Prospect 21,30000,Negotiation,2025-05-14,0.75,New Logo,Renewal,Rep One
+OPP-2052,Prospect 22,120000,Negotiation,2025-06-02,0.75,New Logo,Customer Success,Rep Two
+OPP-2053,Prospect 23,120000,Discovery,2025-05-07,0.1,New Logo,Sales,Rep Three
+OPP-2054,Prospect 24,15000,Proposal,2025-04-20,0.5,New Logo,Marketing,Rep Two
+OPP-2055,Prospect 25,5000,Discovery,2025-04-09,0.1,Upsell,Sales,Rep Two
+OPP-2056,Prospect 26,60000,Demo,2025-05-10,0.25,Upsell,Customer Success,Rep Three
+OPP-2057,Prospect 27,30000,Demo,2025-06-08,0.25,New Logo,Marketing,Rep Two
+OPP-2058,Prospect 28,5000,Demo,2025-06-24,0.25,New Logo,Renewal,Rep Three
+OPP-2059,Prospect 29,250000,Discovery,2025-04-06,0.1,Upsell,Sales,Rep Two

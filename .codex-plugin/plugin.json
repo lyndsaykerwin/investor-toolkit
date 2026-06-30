@@ -1,0 +1,38 @@
+{
+  "name": "investor-toolkit",
+  "version": "1.5.0",
+  "description": "Investor sourcing and analytics skills for market mapping, retention, bookings, pipeline, P&L standardization, and finance-grade workbook formatting.",
+  "author": {
+    "name": "Lyndsay Kerwin",
+    "url": "https://github.com/lyndsaykerwin"
+  },
+  "homepage": "https://github.com/lyndsaykerwin/investor-toolkit",
+  "repository": "https://github.com/lyndsaykerwin/investor-toolkit",
+  "keywords": [
+    "investor",
+    "private-equity",
+    "market-map",
+    "retention",
+    "pipeline",
+    "pnl",
+    "excel"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Investor Toolkit",
+    "shortDescription": "Investor-grade sourcing and analytics skills.",
+    "longDescription": "A shared skill bundle for market mapping, company enrichment, ARR retention, bookings, pipeline analysis, P&L standardization, and banker-grade Excel formatting.",
+    "developerName": "Lyndsay Kerwin",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "websiteURL": "https://github.com/lyndsaykerwin/investor-toolkit",
+    "defaultPrompt": [
+      "Analyze this investor data dump.",
+      "Create a market map for this category.",
+      "Standardize these P&L files."
+    ],
+    "brandColor": "#17365D"
+  }
+}

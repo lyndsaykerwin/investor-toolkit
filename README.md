@@ -6,10 +6,31 @@ Tools for investors: market mapping, target identification, building retention a
 
 **Claude Cowork:** Customize → Personal plugins **+** → Create plugin → Add marketplace → paste `https://github.com/lyndsaykerwin/investor-toolkit` → Sync, then install the **investor-toolkit** plugin.
 
-**Claude Code** — paste this to your agent:
+**Local Claude Code + Codex:** keep this repo as the canonical local working copy, then expose its skills through symlinks:
 
+```bash
+git clone https://github.com/lyndsaykerwin/investor-toolkit.git /Users/lyndsay/Documents/Agent_Skills/investor-toolkit
+cd /Users/lyndsay/Documents/Agent_Skills/investor-toolkit
+scripts/link-skills.sh
+scripts/check-links.sh
 ```
-Fork & clone github.com/lyndsaykerwin/investor-toolkit (e.g. gh repo fork --clone), then install skills/ where my agent loads skills (Claude Code: ~/.claude/skills/), keeping shared/ and templates/ alongside.
+
+The scripts link each investor skill into Claude's `~/.claude/skills` and Codex's `~/.agents/skills`, while the real files stay in this repo under `skills/`.
+
+**Codex plugin compatibility:** this repo also ships `.codex-plugin/plugin.json` and `.agents/plugins/marketplace.json`. To install the plugin view in Codex, run:
+
+```bash
+cd /Users/lyndsay/Documents/Agent_Skills/investor-toolkit
+scripts/sync-codex-plugin.sh
+```
+
+After changing a skill, test locally, then commit and push:
+
+```bash
+scripts/link-skills.sh && scripts/check-links.sh
+git add skills .claude-plugin .codex-plugin .agents scripts README.md
+git commit -m "update investor toolkit skills"
+git push origin main
 ```
 
 ## The Sourcing Workflow

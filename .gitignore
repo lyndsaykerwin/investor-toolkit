@@ -34,3 +34,6 @@ Thumbs.db
 # Local authoring guide — not part of the shipped skills
 AGENTS.md
 CLAUDE.md
+
+# Local symlink/archive maintenance state
+.local/

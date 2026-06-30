@@ -1,0 +1,20 @@
+{
+  "name": "investor-toolkit-local",
+  "interface": {
+    "displayName": "Investor Toolkit Local"
+  },
+  "plugins": [
+    {
+      "name": "investor-toolkit",
+      "source": {
+        "source": "local",
+        "path": "."
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
